@@ -73,9 +73,28 @@ object SubList {
  
   def subListTails[T](l1: List[T], l2: List[T]): Unit = {
     require(!l1.isEmpty && !l2.isEmpty && l1.head == l2.head && subList(l1, l2))
+    if(subList(l1, l2.tail)){
+      (
+        subList(l1, l2)                                                                 ==:| trivial |:
+        ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
+        ((true && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                   ==:| trivial |:
+        (subList(l1.tail, l2.tail) || subList(l1, l2.tail))                             ==:| subListTail(l1, l2.tail) |:                                                        
+        (subList(l1.tail, l2.tail) || subList(l1.tail, l2.tail))                        ==:| trivial |:  
+        subList(l1.tail, l2.tail)                                                    
+      ).qed
+    }else{
+      (
+        subList(l1, l2)                                                                 ==:| trivial |:
+        ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
+        ((true && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                   ==:| trivial |:
+        (subList(l1.tail, l2.tail) || subList(l1, l2.tail))                             ==:| trivial |:                                                        
+        subList(l1.tail, l2.tail)                                                    
+      ).qed
+    }
     
-    //TODO
-    assume(subList(l1.tail, l2.tail))
+    
+    
+    
   }.ensuring(_ =>
     subList(l1.tail, l2.tail)
   )
