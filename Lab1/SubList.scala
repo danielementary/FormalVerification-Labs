@@ -127,10 +127,32 @@ object SubList {
             subList(l1, ys) && subList(l2, zs))                                           ==:| trivial |:
 
             ((x == z) && subList(xs, zs) ||
-            (x == y) && subList(l2, zs) ||
-            ( (y == z) && subList(l2, zs) || subList(l1, ys)))                            ==:| trivial |:
+            subList(l1, ys) && (y == z) ||
+            (subList(l2, zs) && ((x == y) || (x != y) && subList(l1, ys))))               ==:| trivial |:
 
-            
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) ||
+            (subList(l2, zs) && ((x == y) || subList(xs, ys))))                           ==:| trivial |:
+
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) ||
+            (subList(l2, zs) && ((x == y) || true)))                                      ==:| trivial |:
+
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) && subList(ys, zs) ||
+            subList(l2, zs))                                                              ==:| trivial|:
+
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) && true||
+            subList(l2, zs))                                                              ==:| trivial|:
+
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) ||
+            subList(l2, zs))                                                              ==:| trivial|:
+
+            ((x == z) && subList(xs, zs) ||
+            subList(l1, ys) && (y == z) ||
+            subList(l2, zs))                                                              ==:| trivial|:
             
             ((x == z && subList(xs, zs)) || subList(l1, zs))                              ==:| trivial |:
             subList(l1, l3)
@@ -142,12 +164,39 @@ object SubList {
   }.ensuring(_ =>
     subList(l1, l3)
   )
+
+  def tailSmallerThanListLemma[T](l1: List[T]): Unit = {
+    require(!l1.isEmpty)
+  }.ensuring(_ => l1.tail.length <= l1.length)
  
   def subListLength[T](l1: List[T], l2: List[T]): Unit = {
     require(subList(l1, l2))
 
-    //TODO
-    assume(l1.length <= l2.length)
+    (l1, l2) match {
+      case (Cons(x,xs), Cons(y,ys)) if(x == y && subList(xs,ys) && !subList(l1, ys)) => 
+      
+        (
+          subList(l1, l2)                                               ==:| trivial |:
+          ((x == y && subList(xs, ys)) || subList(l1, ys))              ==:| trivial |: 
+          ((subList(xs, ys)) || subList(l1, ys))                        ==:| subListLength(xs, ys) |: 
+          (xs.length <= ys.length )                                     ==:| trivial |:
+          (xs.length <= ys.length )                                     ==:| trivial |:
+          (xs.length+1 <= ys.length+1)                                  ==:| trivial |:
+          (l1.length <= l2.length )
+        ).qed
+
+      case (Cons(x,xs), Cons(y,ys)) if(!(x == y && subList(xs,ys)) && subList(l1, ys)) => 
+        (
+          subList(l1, l2)                                         ==:| trivial |:
+          ((x == y && subList(xs, ys)) || subList(l1, ys))        ==:| trivial |:  
+          subList(l1, ys)                                         ==:| subListLength(l1, ys) |: 
+          // subList(l1, Cons(y,ys))                                 ==:| subListLength(l1, Cons(y,ys)) |: 
+          l1.length <= ys.length                                  ==:| trivial |:
+          l1.length <= ys.length + 1
+        ).qed
+      case _ =>
+        ()
+    }
   }.ensuring(_ =>
     l1.length <= l2.length
   )
