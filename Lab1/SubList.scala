@@ -223,10 +223,12 @@ object SubList {
  
   def subListAntisym[T](l1: List[T], l2: List[T]): Unit = {
     require(subList(l1, l2) && subList(l2, l1))
-    
-    //TODO
-    assume(l1 == l2)
 
+    assert((subList(l1, l2) && subList(l2, l1)))
+    subListLength(l1, l2)
+    assert(l1.length <= l2.length && subList(l2, l1))
+    assert(subList(l2, l1) && l2.length >= l1.length)
+    subListEqual(l2, l1)
   }.ensuring(_ =>
     l1 == l2
   )
