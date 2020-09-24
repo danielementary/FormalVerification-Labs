@@ -115,10 +115,6 @@ object SubList {
   }.ensuring(_ =>
     subList(l1, l3)
   )
-
-  def tailSmallerThanListLemma[T](l1: List[T]): Unit = {
-    require(!l1.isEmpty)
-  }.ensuring(_ => l1.tail.length <= l1.length)
  
   def subListLength[T](l1: List[T], l2: List[T]): Unit = {
     require(subList(l1, l2))
