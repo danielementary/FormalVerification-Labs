@@ -35,34 +35,18 @@ object SubList {
   def subListTail[T](l1: List[T], l2: List[T]): Unit = {
     require(!l1.isEmpty && subList(l1, l2))
 
-    l1 match {
-      case Cons(head1, tail1) if head1 == l2.head && subList(tail1, l2.tail) =>
-        (
-          subList(l1, l2)                                                                 ==:| trivial |:
-          ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
-          ((subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                           ==:| trivial |:
-          (subList(l1.tail, l2.tail))                                                     ==:| trivial |:
-          subList(l1.tail, l2)                                                            ==:| trivial |:
-          true
-        ).qed
-      case Cons(head1, tail1) if head1 == l2.head && !subList(tail1, l2.tail) =>
-        (
-          subList(l1, l2)                                                                 ==:| trivial |:
-          ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
-          ((subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                           ==:| trivial |:
-          subList(l1, l2.tail)                                                            ==:| subListTail(l1, l2.tail) |:
-          subList(l1.tail, l2.tail)
-        ).qed
+    (l1, l2) match {
+      case (Cons(x, xs), Cons(y, ys)) =>
+        if (x == y && subList(xs, ys)) {
+          assert(subList(xs, l2))
+        } else if (subList(l1, ys)) {
+          subListTail(l1, ys)
+          assert(subList(xs, ys))
+        }
 
-      case Cons(head1, tail1) if head1 != l2.head =>
-        (
-          subList(l1, l2)                                                                 ==:| trivial |:
-          ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
-          subList(l1, l2.tail)                                                            ==:| subListTail(l1, l2.tail) |:
-          subList(l1.tail, l2.tail)
-        ).qed
+      case _ => 
+        ()
     }
-    
   }.ensuring(_ =>
     subList(l1.tail, l2)
   )
