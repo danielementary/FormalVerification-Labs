@@ -91,7 +91,7 @@ object SubList {
                 (subList(l1, ys) && y == z && subList(ys, zs)) ||
                 (subList(l1, ys) && subList(l2, zs))))
 
-        //show that any of these case is either x == z && subList(xs, ys) or subList(l1, zs) according to subList defintion on l1 and l3
+        //show that any of these cases is either x == z && subList(xs, ys) or subList(l1, zs) according to subList defintion on l1 and l3
 
         if (x == y && subList(xs, ys) && y == z &&  subList(ys, zs)) {
           subListTrans(xs, ys, zs)
