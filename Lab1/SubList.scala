@@ -96,71 +96,45 @@ object SubList {
     subList(l1.tail, l2.tail)
   )
  
+  def superLemma[T](x: T, y: T, xs: List[T], ys: List[T]): Unit = {
+    require(x == y && subList(xs, ys))
+  }.ensuring(_ =>
+    subList(Cons(x, xs), Cons(y, ys))
+  )
+
   def subListTrans[T](l1: List[T], l2: List[T], l3: List[T]): Unit = {
     require(subList(l1, l2) && subList(l2, l3))
     
-      (l1, l2, l3) match {
-        case (Cons(x, xs), Cons(y, ys), Cons(z, zs)) if(subList(xs,ys) && subList(ys, zs)) =>
-          (
-            (subList(l1, l2) && subList(l2, l3))                                          ==:| trivial |:
-            ((x == y && subList(xs, ys)) || subList(l1, ys) && 
-             (y == z && subList(ys, zs)) || subList(l2, zs))                              ==:| trivial |:
-            
-            ((x == y) && subList(xs, ys) && (y == z) && subList(ys, zs) ||
-            (x == y) && subList(xs, ys) && subList(l2, zs) ||
-            subList(l1, ys) && (y == z) && subList(ys, zs) ||
-            subList(l1, ys) && subList(l2, zs))                                           ==:| trivial |:
+    (l1, l2, l3) match {
+      case (Cons(x, xs), Cons(y,ys), Cons(z, zs)) =>
+        assert(subList(l1, l2) && subList(l2, l3))
 
-            ((x == z) && subList(xs, ys) && subList(ys, zs) ||
-            (x == y) && subList(xs, ys) && subList(l2, zs) ||
-            subList(l1, ys) && (y == z) && subList(ys, zs) ||
-            subList(l1, ys) && subList(l2, zs))                                           ==:| subListTrans(xs, ys, zs) |:
+        assert((x == y && subList(xs, ys) || subList(l1, ys)) &&
+               (y == z && subList(ys, zs) || subList(l2, zs)))
 
-            ((x == z) && subList(xs, zs) ||
-            (x == y) && true && subList(l2, zs) ||
-            subList(l1, ys) && (y == z) && true ||
-            subList(l1, ys) && subList(l2, zs))                                           ==:| trivial |:
+        assert(((x == y && subList(xs, ys) && y == z &&  subList(ys, zs)) ||
+                (x == y && subList(xs, ys) && subList(l2, zs)) ||
+                (subList(l1, ys) && y == z && subList(ys, zs)) ||
+                (subList(l1, ys) && subList(l2, zs))))
 
-            ((x == z) && subList(xs, zs) ||
-            (x == y) && subList(l2, zs) ||
-            subList(l1, ys) && (y == z) ||
-            subList(l1, ys) && subList(l2, zs))                                           ==:| trivial |:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) ||
-            (subList(l2, zs) && ((x == y) || (x != y) && subList(l1, ys))))               ==:| trivial |:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) ||
-            (subList(l2, zs) && ((x == y) || subList(xs, ys))))                           ==:| trivial |:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) ||
-            (subList(l2, zs) && ((x == y) || true)))                                      ==:| trivial |:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) && subList(ys, zs) ||
-            subList(l2, zs))                                                              ==:| trivial|:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) && true||
-            subList(l2, zs))                                                              ==:| trivial|:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) ||
-            subList(l2, zs))                                                              ==:| trivial|:
-
-            ((x == z) && subList(xs, zs) ||
-            subList(l1, ys) && (y == z) ||
-            subList(l2, zs))                                                              ==:| trivial|:
-            
-            ((x == z && subList(xs, zs)) || subList(l1, zs))                              ==:| trivial |:
-            subList(l1, l3)
-          ).qed
-
-        case  _ => ()
-      }
-    
+        if (x == y && subList(xs, ys) && y == z &&  subList(ys, zs)) {
+          subListTrans(xs, ys, zs)
+          assert(x == z && subList(xs, zs))
+        } else if (x == y && subList(xs, ys) && subList(l2, zs)) {
+          superLemma(x, y, xs, ys)
+          subListTrans(l1, l2, zs)
+          assert(subList(l1, zs))
+        } else if (subList(l1, ys) && y == z && subList(ys, zs)) {
+          subListTrans(l1, ys, zs)
+          assert(subList(l1, zs))
+        } else if (subList(l1, ys) && subList(l2, zs)) {
+          subListTail(l2, zs)
+          subListTrans(l1, ys, zs)
+          assert(subList(l1, zs))
+        }
+      case _ =>
+        ()
+    }
   }.ensuring(_ =>
     subList(l1, l3)
   )
@@ -233,10 +207,6 @@ object SubList {
     l1 == l2
   )
  
-  @extern 
-  def assume(b: Boolean): Unit = {
-
-  }ensuring(_ => b)
   @extern
   def main(args: Array[String]): Unit = {
     println(subList(List(0, 2), List(0, 1, 2))) // true
