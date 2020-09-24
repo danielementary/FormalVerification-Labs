@@ -1,8 +1,8 @@
 import stainless.collection._
 import stainless.lang._
 import stainless.annotation._
+
 import stainless.equations._
- import scala.collection.immutable.Stream.Cons
  
 object SubList {
  
