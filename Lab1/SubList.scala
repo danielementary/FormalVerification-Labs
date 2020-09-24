@@ -70,7 +70,7 @@ object SubList {
     subList(l1.tail, l2.tail)
   )
  
-  def superLemma[T](x: T, y: T, xs: List[T], ys: List[T]): Unit = {
+  def superLemma[T](x: T, y: T, xs: List[T], ys: List[T]): Unit = {    //lack of inspiration causes such function names...
     require(x == y && subList(xs, ys))
   }.ensuring(_ =>
     subList(Cons(x, xs), Cons(y, ys))
@@ -91,6 +91,8 @@ object SubList {
                 (subList(l1, ys) && y == z && subList(ys, zs)) ||
                 (subList(l1, ys) && subList(l2, zs))))
 
+        //show that any of these case is either x == z && subList(xs, ys) or subList(l1, zs) according to subList defintion on l1 and l3
+
         if (x == y && subList(xs, ys) && y == z &&  subList(ys, zs)) {
           subListTrans(xs, ys, zs)
           assert(x == z && subList(xs, zs))
@@ -106,6 +108,7 @@ object SubList {
           subListTrans(l1, ys, zs)
           assert(subList(l1, zs))
         }
+
       case _ =>
         ()
     }
