@@ -154,6 +154,7 @@ object SubList {
  
   def subListEqual[T](l1: List[T], l2: List[T]): Unit = {
     require(subList(l1, l2) && l1.length >= l2.length)
+
     subListLength(l1, l2)
     assert(l1.length <= l2.length)
     assert(l1.length == l2.length)
@@ -162,16 +163,19 @@ object SubList {
       case (Cons(x, xs), Cons(y,ys)) =>
         assert(subList(l1, l2))
         assert((x == y && subList(xs, ys)) || subList(l1, ys))
-        if(x == y && subList(xs, ys)){
+    
+        if (x == y && subList(xs, ys)) {
           assert(subList(xs, ys))
+
           subListEqual(xs, ys)
+          
           assert(xs == ys)
           assert(l1 == l2)
         }
+
       case _ =>
         ()
     }
-
   }.ensuring(_ =>
     l1 == l2
   )
