@@ -31,11 +31,6 @@ object SubList {
   }.ensuring(_ =>
     subList(l, l)
   )
-
-  def subListLemmaSubset[T](l1: List[T], l2: List[T]): Unit = {
-    require(!l2.isEmpty && subList(l1, l2.tail))
-
-  }.ensuring(_ => subList(l1, l2))
  
   def subListTail[T](l1: List[T], l2: List[T]): Unit = {
     require(!l1.isEmpty && subList(l1, l2))
