@@ -38,10 +38,10 @@ object SubList {
     (l1, l2) match {
       case (Cons(x, xs), Cons(y, ys)) =>
         if (x == y && subList(xs, ys)) {
-          assert(subList(xs, l2))
+          assert(subList(xs, l2))    //follows from subList definition
         } else if (subList(l1, ys)) {
           subListTail(l1, ys)
-          assert(subList(xs, ys))
+          assert(subList(xs, ys))    //apply subListTail on l1, ys when l1 is a subList of ys according to subList definition
         }
 
       case _ => 
@@ -53,25 +53,19 @@ object SubList {
  
   def subListTails[T](l1: List[T], l2: List[T]): Unit = {
     require(!l1.isEmpty && !l2.isEmpty && l1.head == l2.head && subList(l1, l2))
-    if(subList(l1, l2.tail)){
-      (
-        subList(l1, l2)                                                                 ==:| trivial |:
-        ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
-        ((true && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                   ==:| trivial |:
-        (subList(l1.tail, l2.tail) || subList(l1, l2.tail))                             ==:| subListTail(l1, l2.tail) |:                                                        
-        (subList(l1.tail, l2.tail) || subList(l1.tail, l2.tail))                        ==:| trivial |:  
-        subList(l1.tail, l2.tail)                                                    
-      ).qed
-    }else{
-      (
-        subList(l1, l2)                                                                 ==:| trivial |:
-        ((l1.head == l2.head && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))     ==:| trivial |:
-        ((true && subList(l1.tail, l2.tail)) || subList(l1, l2.tail))                   ==:| trivial |:
-        (subList(l1.tail, l2.tail) || subList(l1, l2.tail))                             ==:| trivial |:                                                        
-        subList(l1.tail, l2.tail)                                                    
-      ).qed
+
+    (l1, l2) match {
+      case (Cons(x, xs), Cons(y, ys)) =>
+        if (subList(l1, ys)) {       //apply subListTail on l1, ys, follows from subList definition when l1 is a sublist of ys
+          subListTail(l1, ys)
+          assert(subList(xs, ys))
+        } else {
+          assert(subList(xs, ys))    //follows from subList definition when heads are the same and l1 is not a sublist of ys
+        }
+
+      case _ =>
+        ()
     }
-    
   }.ensuring(_ =>
     subList(l1.tail, l2.tail)
   )
