@@ -120,23 +120,31 @@ object SubList {
     require(subList(l1, l2))
 
     (l1, l2) match {
-      case (Cons(x,xs), Cons(y,ys))  =>
+      case (Cons(x,xs), Cons(y,ys)) =>
         assert(subList(l1, l2))
         assert((x == y && subList(xs, ys)) || subList(l1, ys))
-        if((x == y && subList(xs, ys))){
+
+        //show that it is valid for these two cases
+
+        if (x == y && subList(xs, ys)) {
           assert((x == y && subList(xs, ys)))
           assert(subList(xs, ys))
+
           subListLength(xs, ys)
+          
           assert(xs.length <= ys.length)
           assert(xs.length + 1 <= ys.length + 1)
           assert(l1.length <= l2.length)
-        } else{
-            assert(subList(l1, ys))
-            subListLength(l1, ys)
-            assert(l1.length <= ys.length)
-            assert(l1.length <= ys.length + 1)
-            assert(l1.length <= l2.length)
+        } else if (subList(l1, ys)) {
+          assert(subList(l1, ys))
+          
+          subListLength(l1, ys)
+          
+          assert(l1.length <= ys.length)
+          assert(l1.length <= ys.length + 1)
+          assert(l1.length <= l2.length)
         }
+
       case _ =>
         ()
     }
