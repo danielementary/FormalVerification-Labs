@@ -12,20 +12,21 @@ object SubList {
     case (Cons(x, xs), Cons(y, ys)) => (x == y && subList(xs, ys)) || subList(l1, ys)
   }
  
-  // for this one the @induct annotation works but I tried to make it manually as well
+  // for this one the @induct annotation works as well
   def subListRefl[T](l: List[T]): Unit = {
     l match {
-      case Nil() => 
-        ()
-      case Cons(head, tail) => 
+      case Cons(x, xs) => 
         (
-          subList(l,l)                                                      ==:| trivial |:
-          subList(Cons(head, tail), Cons(head, tail))                       ==:| trivial |:
-          ((head == head && subList(tail, tail)) || subList(l, tail))       ==:| trivial |:
-          (subList(tail, tail) || subList(l, tail))                         ==:| subListRefl(tail) |:
-          (true || subList(l, tail))                                        ==:| trivial |:
+          subList(l,l)                                       ==:| trivial |:
+          subList(Cons(x, xs), Cons(x, xs))                  ==:| trivial |:
+          ((x == x && subList(xs, xs)) || subList(l, xs))    ==:| trivial |:
+          ((subList(xs, xs)) || subList(l, xs))              ==:| subListRefl(xs) |:
+          ((true || subList(l, xs)))                         ==:| trivial |:
           true
         ).qed
+      
+      case _ =>
+        ()
     }
   }.ensuring(_ =>
     subList(l, l)
