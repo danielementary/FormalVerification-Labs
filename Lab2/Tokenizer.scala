@@ -30,9 +30,17 @@ object Tokenizer {
     pure(a).flatMap(f).parse(ts) == f(a).parse(ts)
   )
  
-  // Following the model of `leftIdentity`, add here the monad laws `rightIdentity` and
-  // `associativity` and make sure that Stainless accepts them.
+  def rightIdentity[A, B](a: A, f: A => Parser[B], ts: List[Token]): Unit = {
+    ()
+  }.ensuring(_ =>
+    pure(a).flatMap(pure).parse(ts) == pure(a).parse(ts)
+  )
  
+  def associativity[A, B](a: A, f: A => Parser[B], ts: List[Token]): Unit = {
+    ()
+  }.ensuring(_ =>
+    pure(a).flatMap(pure).flatMap(f).parse(ts) == pure(a).flatMap(x => pure(x).flatMap(f)).parse(ts)
+  )
  
   /************************************************************************************************/
   /* Part 2: Tokenizer                                                                            */
