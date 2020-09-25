@@ -106,7 +106,7 @@ object Tokenizer {
     // 4) Add (one or more) calls to lemmas (that will have to state and prove above)
     //    to make sure that the assertion (2) is accepted by Stainless
  
-    // 2) Add an assertion here corresponding to the precondition for the first call to tokenize below
+    assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
  
     ts match {
       case Nil() => ()
