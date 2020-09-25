@@ -6,10 +6,10 @@ import stainless.proof.check
  
 object Tokenizer {
  
-  // @extern // WARNING: @extern is unsound, only use for debugging
-  // def assume(b: Boolean): Unit = {
-  //   (??? : Unit)
-  // }.ensuring(_ => b)
+  @extern // WARNING: @extern is unsound, only use for debugging
+  def assume(b: Boolean): Unit = {
+    (??? : Unit)
+  }.ensuring(_ => b)
  
  
   /************************************************************************************************/
@@ -106,6 +106,8 @@ object Tokenizer {
     // 4) Add (one or more) calls to lemmas (that will have to state and prove above)
     //    to make sure that the assertion (2) is accepted by Stainless
  
+    assume(ts.flatMap(t => t.chars).forall(parsableCharacter))
+    assume(ts.flatMap(t => t.chars).forall(parsableCharacter) == ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
     assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
  
     ts match {
