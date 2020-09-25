@@ -41,7 +41,7 @@ object SubList {
           assert(subList(xs, l2))    //follows from subList definition
         } else if (subList(l1, ys)) {
           subListTail(l1, ys)
-          assert(subList(xs, ys))    //apply subListTail on l1, ys when l1 is a subList of ys according to subList definition
+          assert(subList(xs, ys))    //apply subListTail on (l1, ys) when l1 is a subList of ys according to subList definition
         }
 
       case _ => 
@@ -56,7 +56,7 @@ object SubList {
 
     (l1, l2) match {
       case (Cons(x, xs), Cons(y, ys)) =>
-        if (subList(l1, ys)) {       //apply subListTail on l1, ys, follows from subList definition when l1 is a sublist of ys
+        if (subList(l1, ys)) {       //apply subListTail on (l1, ys), follows from subList definition when l1 is a sublist of ys
           subListTail(l1, ys)
           assert(subList(xs, ys))
         } else {
