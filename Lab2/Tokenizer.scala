@@ -36,10 +36,10 @@ object Tokenizer {
     pure(a).flatMap(pure).parse(ts) == pure(a).parse(ts)
   )
  
-  def associativity[A, B](a: A, f: A => Parser[B], ts: List[Token]): Unit = {
+  def associativity[A, B, C](a: A, f: A => Parser[B], g: B => Parser[C], ts: List[Token]): Unit = {
     ()
   }.ensuring(_ =>
-    pure(a).flatMap(pure).flatMap(f).parse(ts) == pure(a).flatMap(x => pure(x).flatMap(f)).parse(ts)
+    pure(a).flatMap(f).flatMap(g).parse(ts) == pure(a).flatMap(x => f(x).flatMap(g)).parse(ts)
   )
  
   /************************************************************************************************/
