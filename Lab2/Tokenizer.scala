@@ -97,25 +97,29 @@ object Tokenizer {
   }
  
   // Write and prove the new lemmas you need for questions (4) and (5) here
+  def helperLemma(t: Token): Unit = {
+    require(parsableToken(t))
+  }.ensuring(_ => t.chars.forall(parsableCharacter))
+
+  def concatLemma(l1: List[Char], l2: List[Char]): Unit = {
+    require(l1.forall(parsableCharacter) && l2.forall(parsableCharacter))
+  }.ensuring( _ => (l1 ++ l2).forall(parsableCharacter))
   def superLemma(ts: List[Token]): Unit = {
     require(ts.forall(parsableToken))
 
     ts match {
       case Nil() => ()
       case Cons(t, ts2) =>
-        (
-          ts.forall(parsableToken) ==:| trivial |:
-          // ts.forall(t => t.chars.forall(parsableCharacter)) ==:| trivial |:
-          // ts.forall(t => t.chars.forall(parsableCharacter)) ==:| trivial |:
-
-          (t.chars.forall(parsableCharacter)) ==:| superLemma(ts2) |:
-          (t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter)) ==:| trivial |:
-          (t.chars ++ ts2.flatMap(t => t.chars)).forall(parsableCharacter) ==:| trivial |:
-          ts.flatMap(t => t.chars).forall(parsableCharacter)
-        ).qed
+        assert(ts.forall(parsableToken))
+        assert(parsableToken(t) && ts2.forall(parsableToken))
+        helperLemma(t)
+        superLemma(ts2)
+        assert(t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter))
+        concatLemma(t.chars, ts2.flatMap(_.chars))
+        assert((t.chars ++ ts2.flatMap(t => t.chars)).forall(parsableCharacter))
     }
 
-  }.ensuring(ts.flatMap(t => t.chars).forall(parsableCharacter))
+  }.ensuring(_ => ts.flatMap(t => t.chars).forall(parsableCharacter))
  
   @opaque
   def retokenizeTokens(ts: List[Token]): Unit = {
