@@ -97,6 +97,25 @@ object Tokenizer {
   }
  
   // Write and prove the new lemmas you need for questions (4) and (5) here
+  def superLemma(ts: List[Token]): Unit = {
+    require(ts.forall(parsableToken))
+
+    ts match {
+      case Nil() => ()
+      case Cons(t, ts2) =>
+        (
+          ts.forall(parsableToken) ==:| trivial |:
+          // ts.forall(t => t.chars.forall(parsableCharacter)) ==:| trivial |:
+          // ts.forall(t => t.chars.forall(parsableCharacter)) ==:| trivial |:
+
+          (t.chars.forall(parsableCharacter)) ==:| superLemma(ts2) |:
+          (t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter)) ==:| trivial |:
+          (t.chars ++ ts2.flatMap(t => t.chars)).forall(parsableCharacter) ==:| trivial |:
+          ts.flatMap(t => t.chars).forall(parsableCharacter)
+        ).qed
+    }
+
+  }.ensuring(ts.flatMap(t => t.chars).forall(parsableCharacter))
  
   @opaque
   def retokenizeTokens(ts: List[Token]): Unit = {
@@ -106,7 +125,7 @@ object Tokenizer {
     // 4) Add (one or more) calls to lemmas (that will have to state and prove above)
     //    to make sure that the assertion (2) is accepted by Stainless
  
-    assume(ts.flatMap(t => t.chars).forall(parsableCharacter))
+    superLemma(ts)
     assume(ts.flatMap(t => t.chars).forall(parsableCharacter) == ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
     assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
  
