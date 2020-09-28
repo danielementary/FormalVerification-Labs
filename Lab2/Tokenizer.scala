@@ -99,6 +99,21 @@ object Tokenizer {
   // Write and prove the new lemmas you need for questions (4) and (5) here
   def helperLemma(t: Token): Unit = {
     require(parsableToken(t))
+    t match {
+      case Identifier(cs) => {
+        assert(cs.forall(isLowerCase) && !cs.isEmpty)
+        assert(cs.forall(isLowerCase))
+        (
+          parsableToken(t)                                                             ==:| trivial |:
+          (cs.forall(isLowerCase) && !cs.isEmpty)                                      ==:| trivial |:
+          cs.forall(isLowerCase)                                                       ==:| trivial |:
+          cs.forall(c => isLowerCase(c))                                               ==:| trivial |:
+          cs.forall(c => isLowerCase(c) || c == ' ' || c == ')' || c == '(')           ==:| trivial |:
+          t.chars.forall(parsableCharacter)
+        ).qed
+      }
+      case _ => ()
+    }
   }.ensuring(_ => t.chars.forall(parsableCharacter))
 
   def concatLemma(l1: List[Char], l2: List[Char]): Unit = {
