@@ -97,28 +97,66 @@ object Tokenizer {
   }
  
   // Write and prove the new lemmas you need for questions (4) and (5) here
+def helperLemmaLowerCharsAreParsable(cs: List[Char]): Unit = {
+          require(cs.forall(isLowerCase))
+
+          cs match {
+            case Nil() => ()
+            case Cons(c, cs2) =>
+              (
+                cs.forall(isLowerCase)                                                              ==:| trivial |:
+                (isLowerCase(c) && cs2.forall(isLowerCase))                                         ==:| trivial |:
+                ((isLowerCase(c) || false) && cs2.forall(isLowerCase))                              ==:| trivial |:
+                ((isLowerCase(c) || c == ' ' || c == '(' || c == ')') && cs2.forall(isLowerCase))   ==:| trivial |:
+                (parsableCharacter(c) && cs2.forall(isLowerCase))                                   ==:| helperLemmaLowerCharsAreParsable(cs2) |:
+                (parsableCharacter(c) && cs2.forall(parsableCharacter))                             ==:| trivial |:
+                cs.forall(parsableCharacter)
+              ).qed
+          }
+        }.ensuring(_ => cs.forall(parsableCharacter))
+
   def helperLemma(t: Token): Unit = {
     require(parsableToken(t))
     t match {
       case Identifier(cs) => {
+        assert(parsableToken(t))
         assert(cs.forall(isLowerCase) && !cs.isEmpty)
         assert(cs.forall(isLowerCase))
-        (
-          parsableToken(t)                                                             ==:| trivial |:
-          (cs.forall(isLowerCase) && !cs.isEmpty)                                      ==:| trivial |:
-          cs.forall(isLowerCase)                                                       ==:| trivial |:
-          cs.forall(c => isLowerCase(c))                                               ==:| trivial |:
-          cs.forall(c => isLowerCase(c) || c == ' ' || c == ')' || c == '(')           ==:| trivial |:
-          t.chars.forall(parsableCharacter)
-        ).qed
+        helperLemmaLowerCharsAreParsable(cs)
+        assert(cs.forall(parsableCharacter))
       }
       case _ => ()
     }
   }.ensuring(_ => t.chars.forall(parsableCharacter))
 
+  def commutativeLemma(l1: List[Char], l2: List[Char]): Unit = {
+    require((l1 ++ l2).forall(parsableCharacter))
+
+  }.ensuring(_ => (l2 ++ l1).forall(parsableCharacter))
+
   def concatLemma(l1: List[Char], l2: List[Char]): Unit = {
     require(l1.forall(parsableCharacter) && l2.forall(parsableCharacter))
+
+    (l1, l2) match {
+      case (Nil(), Nil()) => ()
+      case (Cons(c1, cs1), Nil()) => ()
+      case (Nil(), Cons(c2, cs2)) => ()
+      case (Cons(c1, cs1), Cons(c2, cs2)) => 
+        (
+          (l1.forall(parsableCharacter) && l2.forall(parsableCharacter))                                                                            ==:| trivial |:
+          (parsableCharacter(c1) && cs1.forall(parsableCharacter) && parsableCharacter(c2) && cs2.forall(parsableCharacter))                        ==:| concatLemma(cs1, cs2) |:
+          (parsableCharacter(c1) && parsableCharacter(c2) && (cs1 ++ cs2).forall(parsableCharacter))                                                ==:| trivial |:
+          (parsableCharacter(c2) && Cons(c1, cs1 ++ cs2).forall(parsableCharacter))                                                                 ==:| trivial |:
+          (parsableCharacter(c2) && (Cons(c1, cs1) ++ cs2).forall(parsableCharacter))                                                               ==:| trivial |:
+          (parsableCharacter(c2) && (l1 ++ cs2).forall(parsableCharacter))                                                                          ==:| trivial |:
+          ((Cons(c2, l1 ++ cs2)).forall(parsableCharacter))                                                                                         ==:| trivial |:
+          ((l1 ++ Cons(c2, cs2)).forall(parsableCharacter))                                                                                         ==:| trivial |:
+          ((l2 ++ l1).forall(parsableCharacter))                                                                                                    ==:| commutativeLemma(l2, l1) |:
+          (l1 ++ l2).forall(parsableCharacter)
+        ).qed
+    }
   }.ensuring( _ => (l1 ++ l2).forall(parsableCharacter))
+
   def superLemma(ts: List[Token]): Unit = {
     require(ts.forall(parsableToken))
 
