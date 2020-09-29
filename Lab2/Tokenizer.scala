@@ -148,9 +148,10 @@ def helperLemmaLowerCharsAreParsable(cs: List[Char]): Unit = {
           (parsableCharacter(c1) && parsableCharacter(c2) && (cs1 ++ cs2).forall(parsableCharacter))                                                ==:| trivial |:
           (parsableCharacter(c2) && Cons(c1, cs1 ++ cs2).forall(parsableCharacter))                                                                 ==:| trivial |:
           (parsableCharacter(c2) && (Cons(c1, cs1) ++ cs2).forall(parsableCharacter))                                                               ==:| trivial |:
-          (parsableCharacter(c2) && (l1 ++ cs2).forall(parsableCharacter))                                                                          ==:| trivial |:
-          ((Cons(c2, l1 ++ cs2)).forall(parsableCharacter))                                                                                         ==:| trivial |:
-          ((l1 ++ Cons(c2, cs2)).forall(parsableCharacter))                                                                                         ==:| trivial |:
+          (parsableCharacter(c2) && (l1 ++ cs2).forall(parsableCharacter))                                                                          ==:| commutativeLemma(l1, cs2) |:
+          (parsableCharacter(c2) && (cs2 ++ l1).forall(parsableCharacter))                                                                          ==:| trivial |:
+          ((Cons(c2, cs2 ++ l1)).forall(parsableCharacter))                                                                                         ==:| trivial |:
+          ((Cons(c2, cs2) ++ l1).forall(parsableCharacter))                                                                                         ==:| trivial |:
           ((l2 ++ l1).forall(parsableCharacter))                                                                                                    ==:| commutativeLemma(l2, l1) |:
           (l1 ++ l2).forall(parsableCharacter)
         ).qed
