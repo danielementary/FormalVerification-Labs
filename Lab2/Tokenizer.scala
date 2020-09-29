@@ -171,7 +171,8 @@ object Tokenizer {
     //    to make sure that the assertion (2) is accepted by Stainless
  
     superLemma(ts)
-    assume(ts.flatMap(t => t.chars).forall(parsableCharacter) == ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
+    assert(ts.flatMap(t => t.chars).forall(parsableCharacter))
+    assert(ts.flatMap(t => t.chars).forall(parsableCharacter) == ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
  
     ts match {
       case Nil() => ()
