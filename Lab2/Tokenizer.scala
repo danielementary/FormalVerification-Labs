@@ -129,11 +129,6 @@ def helperLemmaLowerCharsAreParsable(cs: List[Char]): Unit = {
     }
   }.ensuring(_ => t.chars.forall(parsableCharacter))
 
-  def commutativeLemma(l1: List[Char], l2: List[Char]): Unit = {
-    require((l1 ++ l2).forall(parsableCharacter))
-
-  }.ensuring(_ => (l2 ++ l1).forall(parsableCharacter))
-
   def concatLemma(l1: List[Char], l2: List[Char]): Unit = {
     require(l1.forall(parsableCharacter) && l2.forall(parsableCharacter))
 
@@ -144,15 +139,10 @@ def helperLemmaLowerCharsAreParsable(cs: List[Char]): Unit = {
       case (Cons(c1, cs1), Cons(c2, cs2)) => 
         (
           (l1.forall(parsableCharacter) && l2.forall(parsableCharacter))                                                                            ==:| trivial |:
-          (parsableCharacter(c1) && cs1.forall(parsableCharacter) && parsableCharacter(c2) && cs2.forall(parsableCharacter))                        ==:| concatLemma(cs1, cs2) |:
-          (parsableCharacter(c1) && parsableCharacter(c2) && (cs1 ++ cs2).forall(parsableCharacter))                                                ==:| trivial |:
-          (parsableCharacter(c2) && Cons(c1, cs1 ++ cs2).forall(parsableCharacter))                                                                 ==:| trivial |:
-          (parsableCharacter(c2) && (Cons(c1, cs1) ++ cs2).forall(parsableCharacter))                                                               ==:| trivial |:
-          (parsableCharacter(c2) && (l1 ++ cs2).forall(parsableCharacter))                                                                          ==:| commutativeLemma(l1, cs2) |:
-          (parsableCharacter(c2) && (cs2 ++ l1).forall(parsableCharacter))                                                                          ==:| trivial |:
-          ((Cons(c2, cs2 ++ l1)).forall(parsableCharacter))                                                                                         ==:| trivial |:
-          ((Cons(c2, cs2) ++ l1).forall(parsableCharacter))                                                                                         ==:| trivial |:
-          ((l2 ++ l1).forall(parsableCharacter))                                                                                                    ==:| commutativeLemma(l2, l1) |:
+          (parsableCharacter(c1) && cs1.forall(parsableCharacter) && Cons(c2, cs2).forall(parsableCharacter))                                       ==:| concatLemma(cs1, Cons(c2, cs2)) |:
+          (parsableCharacter(c1) && (cs1 ++ Cons(c2, cs2)).forall(parsableCharacter))                                                               ==:| trivial |:
+          (Cons(c1, cs1 ++ Cons(c2, cs2))).forall(parsableCharacter)                                                                                ==:| trivial |:
+          (Cons(c1, cs1) ++ Cons(c2, cs2)).forall(parsableCharacter)                                                                                ==:| trivial |:
           (l1 ++ l2).forall(parsableCharacter)
         ).qed
     }
