@@ -182,6 +182,22 @@ object Tokenizer {
 
   def amazingLemma(t: Token): Unit = {
     require(parsableToken(t))
+
+    parsableTokenMeansParsableChars(t)
+    assert(t.chars.forall(parsableCharacter))
+    assert(t.chars.forall(c => c != ' '))
+
+    t.chars match {
+      case Cons(c, cs) =>
+        (
+          tokenize(t.chars) ==:| trivial |:
+          tokenize(c :: cs) ==:| trivial |:
+
+          List(t)
+        ).qed
+      case _ =>
+        ()
+    }
   }.ensuring(_ => tokenize(t.chars) == List(t))
  
   @opaque
