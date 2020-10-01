@@ -185,18 +185,36 @@ object Tokenizer {
 
     parsableTokenMeansParsableChars(t)
     assert(t.chars.forall(parsableCharacter))
-    assert(t.chars.forall(c => c != ' '))
 
     t.chars match {
-      case Cons(c, cs) =>
-        (
-          tokenize(t.chars) ==:| trivial |:
-          tokenize(c :: cs) ==:| trivial |:
+      case Cons(c, cs) if c == '(' => {
+        assert(cs == Nil())
+        assert(t == Open)
+        assert(t.chars == List('('))
+        assert(tokenize(t.chars) == List(Open))
+      }
+      case Cons(c, cs) if c == ')'=> {
+        assert(cs == Nil())
+        assert(t == Close)
+        assert(t.chars == List(')'))
+        assert(tokenize(t.chars) == List(Close))
+      }
+      case Cons(c, cs2) if isLowerCase(c) => {
+        assert(t.chars.forall(isLowerCase))
+        assert(!t.chars.isEmpty)
+        assert(t == Identifier(t.chars))
 
-          List(t)
-        ).qed
-      case _ =>
-        ()
+        val id = t.chars.takeWhile(isLowerCase)
+        val rest = t.chars.dropWhile(isLowerCase)
+
+        // assert(id == t.chars)
+        // assert(rest == Nil())
+ 
+        dropWhileForall(t.chars, parsableCharacter, isLowerCase)
+ 
+        assert(tokenize(t.chars) == List(Identifier(id)))
+      }
+      case _ => ()
     }
   }.ensuring(_ => tokenize(t.chars) == List(t))
  
