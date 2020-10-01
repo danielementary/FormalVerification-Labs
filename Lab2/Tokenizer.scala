@@ -146,6 +146,14 @@ object Tokenizer {
     }
   }.ensuring( _ => (l1 ++ l2).forall(parsableCharacter))
 
+  def charsListPlusSpaceIsStillParsable(l: List[Char]): Unit = {
+    require(l.forall(parsableCharacter))
+
+    assert(List(' ').forall(parsableCharacter))
+    concatLemma(l, List(' '))
+
+  }.ensuring(_ => (l ++ List(' ')).forall(parsableCharacter))
+
   def superLemma(ts: List[Token]): Unit = {
     require(ts.forall(parsableToken))
 
@@ -153,29 +161,17 @@ object Tokenizer {
       case Cons(t, ts2) =>
         assert(ts.forall(parsableToken))
         assert(parsableToken(t) && ts2.forall(parsableToken))
+
         parsableTokenMeansParsableChars(t)
         superLemma(ts2)
-        assert(t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter))
-        concatLemma(t.chars, ts2.flatMap(_.chars))
-        assert((t.chars ++ ts2.flatMap(t => t.chars)).forall(parsableCharacter))
-      case _ => ()
-    }
-  }.ensuring(_ => ts.flatMap(t => t.chars).forall(parsableCharacter))
+        assert(t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
 
-  def amazingLemma(ts: List[Token]): Unit = {
-    require(ts.flatMap(t => t.chars).forall(parsableCharacter))
+        charsListPlusSpaceIsStillParsable(t.chars)
+        assert((t.chars ++ List(' ')).forall(parsableCharacter) && ts2.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
 
-    ts match {
-      case Cons(t, ts2) =>
-          assert(ts.flatMap(t => t.chars).forall(parsableCharacter))
-          assert(t.chars.forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter))
-          // assume(List(' ').forall(parsableCharacter))
-          assert(t.chars.forall(parsableCharacter) && List(' ').forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter))
-          concatLemma(t.chars, List(' '))
-          assert((t.chars ++ List(' ')).forall(parsableCharacter) && ts2.flatMap(t => t.chars).forall(parsableCharacter))
-          amazingLemma(ts2)
-          assert((t.chars ++ List(' ')).forall(parsableCharacter) && ts2.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
-          assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
+        concatLemma((t.chars ++ List(' ')), ts2.flatMap(t => t.chars ++ List(' ')))
+        assert(((t.chars ++ List(' ')) ++ ts2.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter))
+        assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
       case _ => ()
     }
   }.ensuring(_ => ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
@@ -185,13 +181,8 @@ object Tokenizer {
     require(ts.forall(parsableToken))
     decreases(ts)
  
-    // 4) Add (one or more) calls to lemmas (that will have to state and prove above)
-    //    to make sure that the assertion (2) is accepted by Stainless
- 
     superLemma(ts)
-    assert(ts.flatMap(t => t.chars).forall(parsableCharacter))
-    amazingLemma(ts)
-    assert(ts.flatMap(t => t.chars).forall(parsableCharacter) == ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
+    assert(ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
  
     ts match {
       case Nil() => ()
