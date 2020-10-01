@@ -175,6 +175,14 @@ object Tokenizer {
       case _ => ()
     }
   }.ensuring(_ => ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
+
+  def superConcatLemma(l1: List[Char], l2: List[Char]): Unit = {
+    require(((l1 ++ List(' ')) ++ l2).forall(parsableCharacter))
+  }.ensuring(_ => tokenize((l1 ++ List(' ')) ++ l2) == tokenize(l1) ++ tokenize(l2))
+
+  def amazingLemma(t: Token): Unit = {
+    require(parsableToken(t))
+  }.ensuring(_ => tokenize(t.chars) == List(t))
  
   @opaque
   def retokenizeTokens(ts: List[Token]): Unit = {
@@ -187,13 +195,12 @@ object Tokenizer {
     ts match {
       case Nil() => ()
       case Cons(t, ts2) =>
- 
         (
           tokenize(ts.flatMap(t => t.chars ++ List(' '))) ==:| trivial |: // by definiton of flatMap
- 
-          tokenize((t.chars ++ List(' ')) ++ ts2.flatMap(t => t.chars ++ List(' '))) ==:| trivial |:
-          // 5) Complete the equational reasoning here
- 
+          tokenize((t.chars ++ List(' ')) ++ ts2.flatMap(t => t.chars ++ List(' '))) ==:| superConcatLemma(t.chars, ts2.flatMap(t => t.chars ++ List(' '))) |:
+          tokenize(t.chars) ++ tokenize(ts2.flatMap(t => t.chars ++ List(' '))) ==:| retokenizeTokens(ts2) |:
+          tokenize(t.chars) ++ ts2 ==:| amazingLemma(t) |:
+          List(t) ++ ts2 ==:| trivial |:
           ts
         ).qed
     }
