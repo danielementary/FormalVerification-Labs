@@ -176,11 +176,56 @@ object Tokenizer {
     }
   }.ensuring(_ => ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
 
+  def tokenNotContainSpace(t: Token) : Unit = {
+    require(parsableToken(t))
+    t match {
+      case Identifier(cs) => {
+        assert(cs.forall(isLowerCase) && !cs.isEmpty)
+        
+      }
+      case _ => 
+    }
+  }.ensuring(_ => t.chars.forall(c => c != ' '))
+
+  def testLemma(l1: List[Char], l2: List[Char]): Unit = {
+    require(l1.forall(c => c != ' '))
+  }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(p => p != ' ') == l1)
+
   def superConcatLemma(t: Token, ts: List[Token]): Unit = {
     require((t :: ts).forall(parsableToken) && ((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter) && (ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter))
     
     //je pense que ce serait plus facile de faire en une fois avec le case comme on avait essayé
     //si c'est de la merde, remonte d'un commit
+    val l = (t :: ts).flatMap(t => t.chars ++ List(' '))
+    l match {
+      case Nil() => ()
+      case Cons(c, cs) => {
+        assert(Cons(c, cs) == t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' '))) //YEAH, wasn't confident about this one
+        Cons(c, cs) match {
+          case Cons(c2, cs2) if c2 == ' ' => 
+          case Cons(c2, cs2) if c2 == '(' => 
+          case Cons(c2, cs2) if c2 == ')'  => 
+          case Cons(c2, cs2) if isLowerCase(c2) =>
+            val id = l.takeWhile(isLowerCase)
+            val rest = l.dropWhile(isLowerCase)
+            assert(l == t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' ')))
+            tokenNotContainSpace(t)
+            testLemma(t.chars, ts.flatMap(t => t.chars ++ List(' ')))
+            assert(t.chars.forall(p => p != ' '))
+            assert((t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' '))).takeWhile(p => p != ' ') == t.chars)
+
+            
+            // if(!ts.isEmpty){
+            //   superConcatLemma(ts.head, ts.tail)
+            // }
+            // dropWhileForall(cs2, parsableCharacter, isLowerCase)
+            
+            
+          
+      
+          }
+      }   
+    }
 
   }.ensuring(_ => tokenize((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))) == (List(t) ++ tokenize(ts.flatMap(t => t.chars ++ List(' ')))))
 
