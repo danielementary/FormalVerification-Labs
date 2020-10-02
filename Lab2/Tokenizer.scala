@@ -207,8 +207,8 @@ object Tokenizer {
   }.ensuring(_ => t.chars.forall(c => c != ' '))
 
   def testLemma(l1: List[Char], l2: List[Char]): Unit = {
-    require(l1.forall(c => c != ' '))
-  }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(p => p != ' ') == l1)
+    require(l1.forall(isLowerCase))
+  }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(isLowerCase) == l1 && (l1 ++ List(' ') ++ l2).dropWhile(isLowerCase) == List(' ') ++ l2)
 
   def superConcatLemma(t: Token, ts: List[Token]): Unit = {
     require((t :: ts).forall(parsableToken) && ((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter) && (ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter))
@@ -227,21 +227,15 @@ object Tokenizer {
           case Cons(c2, cs2) if isLowerCase(c2) =>
             val id = l.takeWhile(isLowerCase)
             val rest = l.dropWhile(isLowerCase)
-            assert(l == t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' ')))
+
             tokenNotContainSpace(t)
             testLemma(t.chars, ts.flatMap(t => t.chars ++ List(' ')))
-            assert(t.chars.forall(p => p != ' '))
-            assert((t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' '))).takeWhile(p => p != ' ') == t.chars)
 
-            
-            // if(!ts.isEmpty){
-            //   superConcatLemma(ts.head, ts.tail)
-            // }
-            // dropWhileForall(cs2, parsableCharacter, isLowerCase)
-            
-            
-          
-      
+            assert(rest.forall(parsableCharacter))
+
+            assert(Identifier(id) :: tokenize(rest) == Identifier(t.chars) :: tokenize(rest))
+            assert(Identifier(t.chars) :: tokenize(rest) == Identifier(t.chars) :: tokenize((ts.flatMap(t => t.chars ++ List(' ')))))
+            assert(Identifier(t.chars) :: tokenize((ts.flatMap(t => t.chars ++ List(' ')))) == List(t) ++ tokenize(ts.flatMap(t => t.chars ++ List(' '))))
           }
       }   
     }
