@@ -219,7 +219,7 @@ object Tokenizer {
     l match {
       case Nil() => ()
       case Cons(c, cs) => {
-        assert(Cons(c, cs) == t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' '))) //YEAH, wasn't confident about this one
+        assert(Cons(c, cs) == t.chars ++ List(' ') ++ ts.flatMap(t => t.chars ++ List(' ')))
         Cons(c, cs) match {
           case Cons(c2, cs2) if c2 == ' ' => 
           case Cons(c2, cs2) if c2 == '(' => 
