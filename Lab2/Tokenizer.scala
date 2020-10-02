@@ -207,7 +207,7 @@ object Tokenizer {
   }.ensuring(_ => t.chars.forall(c => c != ' '))
 
   def testLemma(l1: List[Char], l2: List[Char]): Unit = {
-    require(l1.forall(isLowerCase))
+    require(l1.forall(isLowerCase) && l1.forall(c => c != ' '))
   }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(isLowerCase) == l1 && (l1 ++ List(' ') ++ l2).dropWhile(isLowerCase) == List(' ') ++ l2)
 
   def superConcatLemma(t: Token, ts: List[Token]): Unit = {
@@ -229,6 +229,8 @@ object Tokenizer {
             val rest = l.dropWhile(isLowerCase)
 
             tokenNotContainSpace(t)
+            assert(t.chars.forall(isLowerCase))
+            assert(t.chars.forall(c => c != ' '))
             testLemma(t.chars, ts.flatMap(t => t.chars ++ List(' ')))
 
             assert(rest.forall(parsableCharacter))
