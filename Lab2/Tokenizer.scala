@@ -175,13 +175,32 @@ object Tokenizer {
       case _ => ()
     }
   }.ensuring(_ => ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
-
+ 
+  def isLowerCaseThenNotSpace(l: List[Char]): Unit = {
+    require(l.forall(isLowerCase))
+    l match {
+      case Nil() => 
+      case Cons(c, cs) =>
+        (
+          l.forall(isLowerCase)                                                 ==:| trivial |:
+          (isLowerCase(c) && cs.forall(isLowerCase))                            ==:| trivial |:
+          (('a' <= c && c <= 'z') && cs.forall(isLowerCase))                    ==:| isLowerCaseThenNotSpace(cs) |:
+          ((c != ' ') && cs.forall( v => v != ' '))                             ==:| trivial |:
+          l.forall(v => v != ' ')
+        ).qed
+    }
+    
+  }.ensuring(_ => l.forall(c => c != ' '))
   def tokenNotContainSpace(t: Token) : Unit = {
     require(parsableToken(t))
+    
     t match {
       case Identifier(cs) => {
         assert(cs.forall(isLowerCase) && !cs.isEmpty)
-        
+        isLowerCaseThenNotSpace(cs)
+        assert(cs.forall(v => v != ' '))
+
+        // assert(forallProof(cs, isLowerCase))
       }
       case _ => 
     }
