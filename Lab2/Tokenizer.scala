@@ -176,48 +176,14 @@ object Tokenizer {
     }
   }.ensuring(_ => ts.flatMap(t => t.chars ++ List(' ')).forall(parsableCharacter))
 
-  def superConcatLemma(l1: List[Char], l2: List[Char]): Unit = {
-    require(((l1 ++ List(' ')) ++ l2).forall(parsableCharacter))
-  }.ensuring(_ => tokenize((l1 ++ List(' ')) ++ l2) == tokenize(l1) ++ tokenize(l2))
+  def superConcatLemma(t: Token, ts: List[Token]): Unit = {
+    require((t :: ts).forall(parsableToken) && ((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter) && (ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter))
+    
+    //je pense que ce serait plus facile de faire en une fois avec le case comme on avait essayé
+    //si c'est de la merde, remonte d'un commit
 
-  def amazingLemma(t: Token): Unit = {
-    require(parsableToken(t))
+  }.ensuring(_ => tokenize((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))) == (List(t) ++ tokenize(ts.flatMap(t => t.chars ++ List(' ')))))
 
-    parsableTokenMeansParsableChars(t)
-    assert(t.chars.forall(parsableCharacter))
-
-    t.chars match {
-      case Cons(c, cs) if c == '(' => {
-        assert(cs == Nil())
-        assert(t == Open)
-        assert(t.chars == List('('))
-        assert(tokenize(t.chars) == List(Open))
-      }
-      case Cons(c, cs) if c == ')'=> {
-        assert(cs == Nil())
-        assert(t == Close)
-        assert(t.chars == List(')'))
-        assert(tokenize(t.chars) == List(Close))
-      }
-      case Cons(c, cs2) if isLowerCase(c) => {
-        assert(t.chars.forall(isLowerCase))
-        assert(!t.chars.isEmpty)
-        assert(t == Identifier(t.chars))
-
-        val id = t.chars.takeWhile(isLowerCase)
-        val rest = t.chars.dropWhile(isLowerCase)
-
-        // assert(id == t.chars)
-        // assert(rest == Nil())
- 
-        dropWhileForall(t.chars, parsableCharacter, isLowerCase)
- 
-        assert(tokenize(t.chars) == List(Identifier(id)))
-      }
-      case _ => ()
-    }
-  }.ensuring(_ => tokenize(t.chars) == List(t))
- 
   @opaque
   def retokenizeTokens(ts: List[Token]): Unit = {
     require(ts.forall(parsableToken))
@@ -231,9 +197,8 @@ object Tokenizer {
       case Cons(t, ts2) =>
         (
           tokenize(ts.flatMap(t => t.chars ++ List(' '))) ==:| trivial |: // by definiton of flatMap
-          tokenize((t.chars ++ List(' ')) ++ ts2.flatMap(t => t.chars ++ List(' '))) ==:| superConcatLemma(t.chars, ts2.flatMap(t => t.chars ++ List(' '))) |:
-          tokenize(t.chars) ++ tokenize(ts2.flatMap(t => t.chars ++ List(' '))) ==:| retokenizeTokens(ts2) |:
-          tokenize(t.chars) ++ ts2 ==:| amazingLemma(t) |:
+          tokenize((t.chars ++ List(' ')) ++ ts2.flatMap(t => t.chars ++ List(' '))) ==:| superConcatLemma(t, ts2) |:
+          List(t) ++ tokenize(ts2.flatMap(t => t.chars ++ List(' '))) ==:| retokenizeTokens(ts2) |:
           List(t) ++ ts2 ==:| trivial |:
           ts
         ).qed
