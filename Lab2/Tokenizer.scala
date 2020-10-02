@@ -208,6 +208,18 @@ object Tokenizer {
 
   def testLemma(l1: List[Char], l2: List[Char]): Unit = {
     require(l1.forall(isLowerCase) && l1.forall(c => c != ' '))
+    
+    val call = l1.takeWhile(isLowerCase)
+
+    l1 match {
+      case Cons(h,t) if isLowerCase(h) => {
+        assert(Cons(h, t.takeWhile(isLowerCase)) == l1.takeWhile(isLowerCase)) 
+        testLemma(t, l2)
+      }
+      case _ => 
+    }
+    
+
   }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(isLowerCase) == l1 && (l1 ++ List(' ') ++ l2).dropWhile(isLowerCase) == List(' ') ++ l2)
 
   def superConcatLemma(t: Token, ts: List[Token]): Unit = {
@@ -232,6 +244,7 @@ object Tokenizer {
             assert(t.chars.forall(isLowerCase))
             assert(t.chars.forall(c => c != ' '))
             testLemma(t.chars, ts.flatMap(t => t.chars ++ List(' ')))
+
 
             assert(rest.forall(parsableCharacter))
 
