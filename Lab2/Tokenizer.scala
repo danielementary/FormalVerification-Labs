@@ -6,12 +6,6 @@ import stainless.proof.check
  
 object Tokenizer {
  
-  @extern // WARNING: @extern is unsound, only use for debugging
-  def assume(b: Boolean): Unit = {
-    (??? : Unit)
-  }.ensuring(_ => b)
- 
- 
   /************************************************************************************************/
   /* Part 1: Parser                                                                               */
   /************************************************************************************************/
@@ -199,8 +193,6 @@ object Tokenizer {
         assert(cs.forall(isLowerCase) && !cs.isEmpty)
         isLowerCaseThenNotSpace(cs)
         assert(cs.forall(v => v != ' '))
-
-        // assert(forallProof(cs, isLowerCase))
       }
       case _ => 
     }
@@ -218,15 +210,11 @@ object Tokenizer {
       }
       case _ => 
     }
-    
-
   }.ensuring( _ => (l1 ++ List(' ') ++ l2).takeWhile(isLowerCase) == l1 && (l1 ++ List(' ') ++ l2).dropWhile(isLowerCase) == List(' ') ++ l2)
 
   def superConcatLemma(t: Token, ts: List[Token]): Unit = {
     require((t :: ts).forall(parsableToken) && ((t.chars ++ List(' ')) ++ ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter) && (ts.flatMap(t => t.chars ++ List(' '))).forall(parsableCharacter))
     
-    //je pense que ce serait plus facile de faire en une fois avec le case comme on avait essayé
-    //si c'est de la merde, remonte d'un commit
     val l = (t :: ts).flatMap(t => t.chars ++ List(' '))
     l match {
       case Nil() => ()
@@ -244,7 +232,6 @@ object Tokenizer {
             assert(t.chars.forall(isLowerCase))
             assert(t.chars.forall(c => c != ' '))
             testLemma(t.chars, ts.flatMap(t => t.chars ++ List(' ')))
-
 
             assert(rest.forall(parsableCharacter))
 
