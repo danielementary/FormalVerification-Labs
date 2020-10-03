@@ -25,7 +25,11 @@ Lemma enqueue_correct:
   forall T (x : T) (q : queue T),
     toList (enqueue x q) = toList q ++ [x].
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  unfold enqueue.
+  unfold toList.
+  simpl.
+  apply app_assoc.
 Qed.
 
 Lemma dequeue_some_sound:
