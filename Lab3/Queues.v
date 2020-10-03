@@ -3,14 +3,16 @@ Import ListNotations.
 
 Definition queue (T : Type) : Type := list T * list T.
 
-Definition empty_queue (T : Type) : queue T :=
-  (* TO BE IMPLEMENTED *)
+Definition empty_queue (T : Type) : queue T := (@nil T, @nil T).
 
-Definition enqueue { T } (x : T) (q : queue T) : queue T :=
-  (* TO BE IMPLEMENTED *)
+Definition enqueue { T } (x : T) (q : queue T) : queue T := (fst q, cons x (snd q)).
 
-Definition dequeue { T } (q : queue T) : option (T * queue T) :=
-  (* TO BE IMPLEMENTED *)
+Definition dequeue { T } (q : queue T) : option (T * queue T) := 
+  match q with
+  | (nil, nil) => @None (T * queue T)
+  | (nil, l) => @Some (T * queue T) (* to do *)
+  | (cons x xs, l) => @Some (T * queue T) (x, (xs, l))
+end.
 
 Definition toList { T } (q : queue T) : list T := fst q ++ rev (snd q).
 
