@@ -37,7 +37,9 @@ Lemma dequeue_some_sound:
     dequeue q = Some (x, q') ->
     toList q = x :: toList q'.
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  destruct q eqn:Eqb.
+  + inversion H. unfold toList. simpl.
 Qed.
 
 Lemma dequeue_none_sound:
