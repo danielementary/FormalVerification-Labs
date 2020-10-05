@@ -7,15 +7,12 @@ Definition empty_queue (T : Type) : queue T := (@nil T, @nil T).
 
 Definition enqueue { T } (x : T) (q : queue T) : queue T := (fst q, cons x (snd q)).
 
-Definition dequeue_helper { T } (l : list T) : option (T * queue T) :=
-  match l with
-  | nil => @None (T * queue T)
-  | cons x xs => @Some (T * queue T) (x, (xs, nil))
-end.
-
 Definition dequeue { T } (q : queue T) : option (T * queue T) := 
   match q with
-  | (nil, l) => dequeue_helper (rev l)
+  | (nil, l) => match rev l with
+                | nil => @None (T * queue T)
+                | cons x xs => @Some (T * queue T) (x, (xs, nil))
+                end
   | (cons x xs, l) => @Some (T * queue T) (x, (xs, l))
 end.
 
@@ -38,8 +35,8 @@ Lemma dequeue_some_sound:
     toList q = x :: toList q'.
 Proof.
   intros.
-  destruct q eqn:Eqb.
-  + inversion H. unfold toList. simpl.
+  unfold dequeue in H.
+  destruct q eqn:Eqb. destruct l eqn:Eqc.
 Qed.
 
 Lemma dequeue_none_sound:
