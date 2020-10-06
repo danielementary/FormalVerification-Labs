@@ -29,14 +29,32 @@ Proof.
   apply app_assoc.
 Qed.
 
+Lemma super_lemma:
+  forall T (q : queue T),
+    q = (@nil T, @nil T) ->
+    toList q = [].
+Proof.
+  intros.
+  rewrite -> H.
+  unfold toList.
+  simpl.
+  reflexivity.
+Qed.
+
+Lemma dequeue_none_complete:
+  forall T (q : queue T),
+    toList q = [] ->
+    dequeue q = None.
+Proof.
+  intros.
+Qed.
+
 Lemma dequeue_some_sound:
   forall T (x : T) (q q' : queue T),
     dequeue q = Some (x, q') ->
     toList q = x :: toList q'.
 Proof.
-  intros.
-  unfold dequeue in H.
-  destruct q eqn:Eqb. destruct l eqn:Eqc.
+  (* TO BE COMPLETED *)
 Qed.
 
 Lemma dequeue_none_sound:
@@ -53,14 +71,6 @@ Lemma dequeue_some_complete:
   exists (q' : queue T),
     dequeue q = Some (x, q') /\
     toList q' = xs.
-Proof.
-  (* TO BE COMPLETED *)
-Qed.
-
-Lemma dequeue_none_complete:
-  forall T (q : queue T),
-    toList q = [] ->
-    dequeue q = None.
 Proof.
   (* TO BE COMPLETED *)
 Qed.
