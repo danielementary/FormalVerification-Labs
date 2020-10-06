@@ -47,6 +47,7 @@ Lemma dequeue_none_complete:
     dequeue q = None.
 Proof.
   intros.
+
 Qed.
 
 Lemma dequeue_some_sound:
