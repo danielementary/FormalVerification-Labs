@@ -41,13 +41,49 @@ Proof.
   reflexivity.
 Qed.
 
+
 Lemma dequeue_none_complete:
   forall T (q : queue T),
     toList q = [] ->
     dequeue q = None.
 Proof.
   intros.
+  unfold dequeue. destruct q. destruct l.
+  + unfold toList in H. unfold fst in H. unfold snd in H. simpl in H. rewrite -> H. trivial.
+  + destruct Some. 
+    - discriminate.
+    - trivial.
+Qed.
 
+Lemma options_equal_inl_equal:
+  forall (T A : Type) (t1 t2: T)(a1 a2: A),
+      Some(t1, a1) = Some(t2, a2) ->
+      (t1,a1) = (t2, a2).
+Proof.
+  intros.
+  inversion H.
+  apply injective_projections.
+  + unfold fst. trivial.
+  + unfold snd. trivial.
+Qed.
+
+Lemma add_parenthesis_to_cons:
+  forall T (x: T)(l: list T),
+    x::l++[] = (x::l) ++ [].
+Proof.
+  intros.
+  simpl.
+  trivial.
+Qed.
+
+Lemma add_empty_does_nothing:
+  forall T (x: T)(l: list T),
+    (x::l)++[] = (x::l).
+Proof.
+  intros.
+  induction (x::l).
+  + trivial.
+  + simpl. rewrite -> IHl0. trivial.
 Qed.
 
 Lemma dequeue_some_sound:
@@ -55,15 +91,58 @@ Lemma dequeue_some_sound:
     dequeue q = Some (x, q') ->
     toList q = x :: toList q'.
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  destruct q.
+  destruct q'.
+  destruct l.
+  + destruct l0.
+    - destruct l1.
+      * destruct l2.
+        ** unfold toList. unfold fst. unfold snd. unfold rev. simpl. discriminate.
+        ** unfold toList. unfold fst. unfold snd. simpl. discriminate.
+      * unfold toList. unfold fst. unfold snd. simpl. discriminate.
+    - unfold toList. unfold fst. unfold snd. simpl. unfold dequeue in H. simpl in H. destruct (rev l0 ++ [t]).
+                                                                                     * discriminate.
+                                                                                     * inversion H. simpl.
+                                                                                       pose proof add_parenthesis_to_cons as X. 
+                                                                                       rewrite -> X.
+                                                                                       pose proof add_empty_does_nothing as Y.
+                                                                                       rewrite -> Y. trivial.
+  + unfold dequeue in H. inversion H. unfold toList. unfold fst. unfold snd. simpl. trivial.
 Qed.
+
+Lemma cons_app_same:
+  forall T (l: list T)(t: T),
+    t::l = [t] ++ l.
+Proof.
+  intros.
+  simpl.
+  trivial.
+Qed.
+
+Lemma rev_empty:
+  forall T (l: list T),
+  rev l = [] ->
+  l = [].
+Proof.
+  intros.
+  rewrite <- H. induction l.
+  + trivial.
+  +  pose proof rev_app_distr. pose proof cons_app_same. pose proof rev_app_distr. rewrite -> H1. rewrite -> H0. simpl.
+  
+ Qed.
 
 Lemma dequeue_none_sound:
   forall T (q : queue T),
     dequeue q = None ->
     toList q = [].
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  destruct q. destruct l.
+  + destruct l0.
+    - unfold toList. unfold fst. unfold snd. unfold rev. simpl. trivial.
+    - unfold toList. unfold fst. unfold snd. simpl. destruct (rev l0) eqn:Eqb.
+                                                    * simpl. inversion H. inversion H1.
 Qed.
 
 Lemma dequeue_some_complete:
