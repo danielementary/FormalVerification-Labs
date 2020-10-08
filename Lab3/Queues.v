@@ -177,7 +177,15 @@ Proof.
       + unfold toList. unfold fst. unfold snd.  trivial.
 Qed.
 
-Lemma dequue_some_complete_reverse:
+Lemma super_heavy_lemma:
+  forall T (x : T) (xs : list T),
+    toList (xs, []) = xs.
+Proof.
+  intros.
+  unfold toList. unfold fst. unfold snd. simpl. rewrite app_nil_r. trivial.
+Qed.
+
+Lemma dequeue_some_complete_reverse:
 forall T (x : T) (xs : list T) (q : queue T),
   exists (q' : queue T),
     dequeue q = Some (x, q') /\
@@ -186,7 +194,7 @@ forall T (x : T) (xs : list T) (q : queue T),
 Proof.
   intros.
   pose proof dequeue_some_sound.
-  exists (xs, []). unfold toList. unfold fst. unfold snd. simpl.
+  exists (xs, []). rewrite super_heavy_lemma.
 Qed.
 
 Theorem dequeue_none_correct:
