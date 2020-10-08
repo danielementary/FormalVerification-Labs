@@ -177,6 +177,16 @@ Proof.
       + unfold toList. unfold fst. unfold snd.  trivial.
 Qed.
 
+Lemma dequue_some_complete_reverse:
+forall T (x : T) (xs : list T) (q : queue T),
+  exists (q' : queue T),
+    dequeue q = Some (x, q') /\
+    toList q' = xs ->
+    toList q = x :: xs.
+Proof.
+  intros.
+Qed.
+
 Theorem dequeue_none_correct:
   forall T (q : queue T),
     toList q = [] <->
@@ -195,5 +205,8 @@ forall T (q : queue T) (x : T) (xs : list T),
     dequeue q = Some (x, q') /\
     toList q' = xs.
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  pose proof dequeue_some_sound. pose proof dequeue_some_complete. split.
+  + apply H0.
+  + 
 Qed.
