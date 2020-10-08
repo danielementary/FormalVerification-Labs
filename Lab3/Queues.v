@@ -86,30 +86,7 @@ Proof.
   + simpl. rewrite -> IHl0. trivial.
 Qed.
 
-Lemma dequeue_some_sound:
-  forall T (x : T) (q q' : queue T),
-    dequeue q = Some (x, q') ->
-    toList q = x :: toList q'.
-Proof.
-  intros.
-  destruct q.
-  destruct q'.
-  destruct l.
-  + destruct l0.
-    - destruct l1.
-      * destruct l2.
-        ** unfold toList. unfold fst. unfold snd. unfold rev. simpl. discriminate.
-        ** unfold toList. unfold fst. unfold snd. simpl. discriminate.
-      * unfold toList. unfold fst. unfold snd. simpl. discriminate.
-    - unfold toList. unfold fst. unfold snd. simpl. unfold dequeue in H. simpl in H. destruct (rev l0 ++ [t]).
-                                                                                     * discriminate.
-                                                                                     * inversion H. simpl.
-                                                                                       pose proof add_parenthesis_to_cons as X. 
-                                                                                       rewrite -> X.
-                                                                                       pose proof add_empty_does_nothing as Y.
-                                                                                       rewrite -> Y. trivial.
-  + unfold dequeue in H. inversion H. unfold toList. unfold fst. unfold snd. simpl. trivial.
-Qed.
+
 
 Lemma cons_app_same:
   forall T (l: list T)(t: T),
@@ -177,6 +154,31 @@ Proof.
       + unfold toList. unfold fst. unfold snd.  trivial.
 Qed.
 
+Lemma dequeue_some_sound:
+  forall T (x : T) (q q' : queue T),
+    dequeue q = Some (x, q') ->
+    toList q = x :: toList q'.
+Proof.
+  intros.
+  destruct q.
+  destruct q'.
+  destruct l.
+  + destruct l0.
+    - destruct l1.
+      * destruct l2.
+        ** unfold toList. unfold fst. unfold snd. unfold rev. simpl. discriminate.
+        ** unfold toList. unfold fst. unfold snd. simpl. discriminate.
+      * unfold toList. unfold fst. unfold snd. simpl. discriminate.
+    - unfold toList. unfold fst. unfold snd. simpl. unfold dequeue in H. simpl in H. destruct (rev l0 ++ [t]).
+                                                                                     * discriminate.
+                                                                                     * inversion H. simpl.
+                                                                                       pose proof add_parenthesis_to_cons as X. 
+                                                                                       rewrite -> X.
+                                                                                       pose proof add_empty_does_nothing as Y.
+                                                                                       rewrite -> Y. trivial.
+  + unfold dequeue in H. inversion H. unfold toList. unfold fst. unfold snd. simpl. trivial.
+Qed.
+
 Lemma super_heavy_lemma:
   forall T (x : T) (xs : list T),
     toList (xs, []) = xs.
@@ -194,7 +196,9 @@ forall T (x : T) (xs : list T) (q : queue T),
 Proof.
   intros.
   pose proof dequeue_some_sound.
-  exists (xs, []). rewrite super_heavy_lemma.
+  exists (xs, []). rewrite super_heavy_lemma. 
+  + intros. inversion H0. pose proof H _ _ _ (xs, []) H1.  rewrite -> H3. unfold toList. unfold fst. unfold snd. simpl. rewrite app_nil_r. trivial.
+  + trivial.
 Qed.
 
 Theorem dequeue_none_correct:
@@ -216,7 +220,7 @@ forall T (q : queue T) (x : T) (xs : list T),
     toList q' = xs.
 Proof.
   intros.
-  pose proof dequeue_some_sound. pose proof dequeue_some_complete. split.
-  + apply H0.
-  + 
+  split.
+  + pose proof dequeue_some_complete. apply H.
+  + pose proof dequeue_some_sound T x q (xs, []).
 Qed.
