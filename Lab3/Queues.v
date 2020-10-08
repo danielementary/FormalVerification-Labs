@@ -171,7 +171,7 @@ Theorem dequeue_none_correct:
     toList q = [] <->
     dequeue q = None.
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
 Qed.
 
 Theorem dequeue_some_correct:
