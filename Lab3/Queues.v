@@ -120,6 +120,18 @@ Proof.
   trivial.
 Qed.
 
+Lemma blabla_not_empty:
+  forall T (l: list T)(t: T),
+    l++ [t] <> [].
+Proof.
+  intros.
+  simpl.
+  trivial.
+  induction l.
+  + trivial. simpl. discriminate.
+  + pose proof app_cons_not_nil. trivial. simpl. discriminate.
+Qed.
+
 Lemma rev_empty:
   forall T (l: list T),
   rev l = [] ->
@@ -128,8 +140,8 @@ Proof.
   intros.
   rewrite <- H. induction l.
   + trivial.
-  +  pose proof rev_app_distr. pose proof cons_app_same. pose proof rev_app_distr. rewrite -> H1. rewrite -> H0. simpl.
-  
+  +  pose proof rev_app_distr. pose proof cons_app_same. pose proof rev_app_distr. 
+      rewrite -> H1. rewrite -> H0. simpl. unfold rev in H. pose proof blabla_not_empty. apply H3 in H. contradiction.
  Qed.
 
 Lemma dequeue_none_sound:
@@ -142,7 +154,7 @@ Proof.
   + destruct l0.
     - unfold toList. unfold fst. unfold snd. unfold rev. simpl. trivial.
     - unfold toList. unfold fst. unfold snd. simpl. destruct (rev l0) eqn:Eqb.
-                                                    * simpl. inversion H. inversion H1.
+                                                    * simpl. inversion H. inversion H1. pose proof
 Qed.
 
 Lemma dequeue_some_complete:
