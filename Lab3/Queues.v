@@ -156,7 +156,7 @@ Proof.
     - unfold toList. unfold fst. unfold snd. simpl. destruct (rev l0) eqn:Eqb.
                                                     * simpl. inversion H. inversion H1. pose proof rev_empty. apply H0. rewrite -> Eqb in H1. simpl in H1. discriminate.
                                                     * inversion H. rewrite Eqb in H1. simpl in H1. discriminate.
-  +
+  + unfold dequeue in H. discriminate.
 Qed.
 
 Lemma dequeue_some_complete:
