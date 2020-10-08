@@ -185,6 +185,8 @@ forall T (x : T) (xs : list T) (q : queue T),
     toList q = x :: xs.
 Proof.
   intros.
+  pose proof dequeue_some_sound.
+  exists (xs, []). unfold toList. unfold fst. unfold snd. simpl.
 Qed.
 
 Theorem dequeue_none_correct:
