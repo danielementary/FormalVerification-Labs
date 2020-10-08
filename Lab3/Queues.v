@@ -55,18 +55,6 @@ Proof.
     - trivial.
 Qed.
 
-Lemma options_equal_inl_equal:
-  forall (T A : Type) (t1 t2: T)(a1 a2: A),
-      Some(t1, a1) = Some(t2, a2) ->
-      (t1,a1) = (t2, a2).
-Proof.
-  intros.
-  inversion H.
-  apply injective_projections.
-  + unfold fst. trivial.
-  + unfold snd. trivial.
-Qed.
-
 Lemma add_parenthesis_to_cons:
   forall T (x: T)(l: list T),
     x::l++[] = (x::l) ++ [].
@@ -166,7 +154,16 @@ Lemma dequeue_some_complete:
     dequeue q = Some (x, q') /\
     toList q' = xs.
 Proof.
-  (* TO BE COMPLETED *)
+  intros.
+  unfold toList in H. unfold fst in H. unfold snd in H. simpl.
+  destruct q. destruct l. destruct l0.
+  + discriminate.
+  + simpl in H. unfold dequeue. simpl. rewrite H. exists ((xs, [])). split.
+                                                                     - trivial.
+                                                                     - unfold toList. unfold fst. unfold snd. simpl. apply app_nil_r.
+  + unfold dequeue. exists(l, l0). inversion H. split.
+                                   - trivial.
+                                   - unfold toList. unfold fst. unfold snd. trivial.
 Qed.
 
 Theorem dequeue_none_correct:
