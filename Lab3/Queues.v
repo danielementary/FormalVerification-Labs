@@ -222,5 +222,5 @@ Proof.
   intros.
   split.
   + pose proof dequeue_some_complete. apply H.
-  + pose proof dequeue_some_sound T x q (xs, []).
+  +  intros. inversion H. pose proof dequeue_some_sound T x q x0. destruct H0. rewrite -> H2 in H1. apply H1. apply H0.
 Qed.
