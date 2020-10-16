@@ -16,11 +16,29 @@ Definition compose {A: Type} (r1 r2: relation A): relation A :=
 
 Notation "r1 ** r2" := (compose r1 r2) (at level 20).
 
+(* destruct existentials in context *)
+Ltac destruct_exists :=
+  match goal with
+  | H: exists x, _ |- _ => let freshX := fresh x in destruct H as [ freshX ]
+  end.
+
 Lemma compose_assoc:
   forall A (r1 r2 r3: relation A),
     r1 ** (r2 ** r3) == (r1 ** r2) ** r3.
 Proof.
-Admitted.
+  intros. 
+  unfold compose. unfold equivalent_relations. split.
+    + intros. destruct H. destruct H. destruct H0. destruct H0. exists x1. split. 
+      - exists x0. split.
+        * apply H.
+        * apply H0.
+      - apply H1.
+    + intros. destruct H. destruct H. destruct H. destruct H. exists x1. split.
+      - apply H.
+      - exists x0. split.
+        * apply H1.
+        * apply H0.
+Qed.
 
 Fixpoint rel_pow {A: Type} (r: relation A) (n: nat): relation A :=
   match n with
