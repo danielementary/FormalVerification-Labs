@@ -80,7 +80,20 @@ Lemma power_to_path:
     (r ^^ n) x y ->
     exists p: list A, is_path r x p y /\ length p = n.
 Proof.
-Admitted.
+  induction n. intros.
+    + simpl in H. exists []. simpl. split.
+      - apply H.
+      - trivial.
+    + intros. inversion H. exists (x0::p).
+Qed.
+
+Proof.
+  induction n. 
+    + intros. simpl in H. exists []. simpl. split. 
+      - apply H.
+      - trivial.
+    + intros. simpl in H. unfold compose in H. pose proof IHn x y. destruct H. destruct H. .
+Qed.
 
 Lemma path_compose:
   forall (A: Type) (r: relation A) (p1 p2: list A) (x y z: A),
