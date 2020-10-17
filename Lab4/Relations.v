@@ -57,7 +57,12 @@ Fixpoint is_path {A: Type} (r: relation A) (x: A) (p: list A) (y: A): Prop :=
 Lemma path_to_power: forall A (r: relation A) (p: list A) (y x: A),
     is_path r x p y -> (r ^^ (length p)) x y.
 Proof.
-Admitted.
+   induction p. 
+    + intros. simpl. simpl in H. apply H.
+    + simpl. intros. unfold compose. destruct H.  exists a.  split.
+      - apply H.
+      - pose proof IHp y a. apply H1. apply H0. 
+Qed.
 
 Lemma is_path_cons:
   forall A (r: relation A) (x y z: A) (p: list A),
@@ -65,7 +70,10 @@ Lemma is_path_cons:
     is_path r y p z ->
     is_path r x (y :: p) z.
 Proof.
-Admitted.
+  intros. simpl. split.
+    + apply H.
+    + apply H0.
+Qed.
 
 Lemma power_to_path:
   forall A (r: relation A) (n: nat) (x y: A),
