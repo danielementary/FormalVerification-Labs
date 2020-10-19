@@ -83,10 +83,17 @@ Proof.
   induction n. 
     + intros. simpl in H. exists []. simpl. split. 
       - apply H.
-      - trivial.
-    + intros. simpl in H. unfold compose in H. pose proof IHn x y. destruct H. destruct H.
-
+      - trivial. 
+    + intros. simpl. unfold compose. intuition. destruct H. 
+      destruct H. pose proof is_path_cons A r. pose proof IHn x0 y. destruct H2.
+      - apply H0.
+      - inversion H2. exists (x0::x1). simpl. split.
+        * simpl. split.
+          ++ apply H.
+          ++ apply H3.
+        * rewrite H4. trivial.
 Qed.
+
 
 Lemma path_compose:
   forall (A: Type) (r: relation A) (p1 p2: list A) (x y z: A),
