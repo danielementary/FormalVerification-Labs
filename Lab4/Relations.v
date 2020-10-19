@@ -289,7 +289,14 @@ Lemma is_trace_aux_cons:
     is_trace_aux ts q2 qs xs ->
     is_trace_aux ts q1 (q2 :: qs) (x :: xs).
 Proof.
-Admitted.
+  induction qs.
+    + intros. unfold is_trace_aux. split.
+      - apply H.
+      - trivial.
+    + intros. simpl. split. 
+      * apply H.
+      * trivial.
+Qed.
 
 
 (** Equivalence between reachability and traces **)
@@ -301,7 +308,15 @@ Lemma in_trace_reachable:
     in_trace q tr ->
     reachable ts q.
 Proof.
-Admitted.
+  intros. unfold reachable. inversion H. inversion H0.
+    + exists (start tr). split. 
+      - apply H2.
+      - rewrite H3. unfold star. exists 0. simpl. trivial.
+    + exists (start tr). split.
+      - apply H2.
+      - simpl in H3. 
+ 
+Qed.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
