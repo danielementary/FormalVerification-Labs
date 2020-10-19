@@ -187,7 +187,12 @@ Lemma star_1n:
     star r y z ->
     star r x z.
 Proof.
-Admitted.
+  intros.
+  inversion H0.
+  unfold star. exists (S x0). simpl. unfold compose. exists y. split.
+    + apply H.
+    + apply H1. 
+Qed.
 
 
 (** Transition Systems and Reachability **)
