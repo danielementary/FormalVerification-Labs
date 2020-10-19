@@ -308,14 +308,18 @@ Lemma in_trace_reachable:
     in_trace q tr ->
     reachable ts q.
 Proof.
-  intros. unfold reachable. inversion H. inversion H0.
-    + exists (start tr). split. 
-      - apply H2.
-      - rewrite H3. unfold star. exists 0. simpl. trivial.
-    + exists (start tr). split.
-      - apply H2.
-      - simpl in H3. 
- 
+  intros.
+  unfold reachable.
+  exists (start tr).
+  unfold in_trace in H0.
+  destruct H0.
+  inversion H.
+  split.
+    + apply H2.
+    + rewrite H0. unfold star. exists 0. simpl. trivial.
+    + split.
+      - inversion H. apply H2.
+      - inversion H.
 Qed.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
