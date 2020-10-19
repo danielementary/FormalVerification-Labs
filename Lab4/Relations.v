@@ -277,7 +277,10 @@ Definition is_trace { Q A } (ts: Transition_System Q A) (tr: Trace Q A) : Prop :
 Lemma is_trace_aux_nil:
   forall Q A (ts : Transition_System Q A) q, is_trace_aux ts q nil nil.
 Proof.
-Admitted.
+  intros.
+  unfold is_trace_aux. 
+  trivial.
+Qed.
 
 (* A trace can be extended from the front with another transition *)
 Lemma is_trace_aux_cons:
