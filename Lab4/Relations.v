@@ -85,7 +85,8 @@ Proof.
       - apply H.
       - trivial.
     + intros. simpl in H. unfold compose in H. pose proof IHn x y. destruct H. destruct H.
-Admitted.
+
+Qed.
 
 Lemma path_compose:
   forall (A: Type) (r: relation A) (p1 p2: list A) (x y z: A),
