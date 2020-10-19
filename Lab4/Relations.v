@@ -101,13 +101,15 @@ Lemma path_compose:
     is_path r y p2 z ->
     is_path r x (p1 ++ p2) z.
 Proof.
-  intros. induction p1. induction p2.
-  - simpl. simpl in H. rewrite H. unfold is_path in H0. rewrite H0. reflexivity.
-  - simpl. simpl in H. simpl in H0. rewrite H. apply H0.
-  - simpl. simpl in H. destruct H. split.
+  induction p1. induction p2.
+  - simpl. intros. simpl in H. rewrite H. unfold is_path in H0. rewrite H0. reflexivity.
+  - simpl. intros. simpl in H. simpl in H0. rewrite H. apply H0.
+  - simpl. intros. simpl in H. destruct H. split.
     + apply H.
-    +
-Admitted.
+    + pose proof IHp1 p2 a y z. apply H2.
+      * apply H1.
+      * apply H0.
+Qed.
 
 Lemma power_compose:
   forall A (r : relation A) (n1 n2: nat),
