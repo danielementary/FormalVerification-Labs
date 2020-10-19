@@ -115,7 +115,32 @@ Lemma power_compose:
   forall A (r : relation A) (n1 n2: nat),
     (r ^^ n1) ** (r ^^ n2) == r ^^ (n1 + n2).
 Proof.
-Admitted.
+  induction n1.
+    + intros. simpl. unfold compose. split.
+      * intros. inversion H. destruct H0. rewrite <- H0 in H1. apply H1.
+      * intros. exists x. split.
+        - trivial.
+        - apply H.
+    + intros. simpl. unfold equivalent_relations. intros. 
+        
+        pose proof compose_assoc A r (r^^n1) (r^^n2) as useless1. 
+        unfold equivalent_relations in useless1.
+        pose proof IHn1 n2 as useless2. 
+        unfold equivalent_relations in useless2. 
+
+        pose proof useless1 x y as H1. destruct H1 as (H11, H12).
+        split.
+        - intros. inversion H. unfold compose in H0; destruct H0. inversion H0. unfold compose. exists x1. split.
+          * destruct H2. apply H2.
+          * pose proof useless2 x1 y as H3; destruct H3 as (H31, H32). apply H31. unfold compose. exists x0. split.
+            ** destruct H2. apply H3.
+            ** apply H1.
+        - intros. apply H11. unfold compose. inversion H; destruct H0. exists x0. split.
+          * apply H0.
+          * pose proof useless2 x0 y. destruct H2. apply H3 in H2. 
+            ** unfold compose in H2. inversion H2. exists x1. apply H4.
+            **  apply H3. apply H1.
+Qed.
 
 (* `star r` is the reflexive and transitive closure of the relation `R` *)
 Definition star { A } (r : relation A): A -> A -> Prop :=
@@ -126,7 +151,8 @@ Lemma star_refl:
   forall A (r: relation A) x,
     star r x x.
 Proof.
-Admitted.
+  intros. unfold star. exists 0. simpl. trivial.
+Qed.
 
 (* The reflexive and transitive closure of a relation is transitive *)
 Lemma star_trans:
@@ -135,7 +161,13 @@ Lemma star_trans:
     star r y z ->
     star r x z.
 Proof.
-Admitted.
+  unfold star. intros. inversion H. inversion H0. exists (x0+x1). pose proof power_compose.
+  pose proof H3 A r x0 x1. unfold equivalent_relations in H4. pose proof H4 x z. destruct H5.
+  apply H5. unfold compose. exists y. split.
+    * apply H1.
+    * apply H2.
+
+Qed.
 
 (* The transitive closure of a relation "contains" the relation *)
 Lemma star_step:
