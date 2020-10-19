@@ -175,7 +175,11 @@ Lemma star_step:
     r x y ->
     star r x y.
 Proof.
-Admitted.
+  intros. unfold star. exists 1. simpl. unfold compose. exists y. split.
+    + apply H.
+    + trivial.
+Qed.
+
 
 Lemma star_1n:
   forall A (r: relation A) x y z,
