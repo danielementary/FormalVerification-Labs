@@ -319,8 +319,8 @@ Proof.
     + rewrite H0. unfold star. exists 0. simpl. trivial.
     + split.
       - inversion H. apply H2.
-      - inversion H.
-Qed.
+      - inversion H. admit.
+Admitted.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
@@ -330,6 +330,20 @@ Lemma reachable_in_trace:
       is_trace ts tr /\
       in_trace q tr.
 Proof.
+  intros.
+  inversion H. destruct H0. inversion H1.
+  destruct x0.
+    + simpl in H2.
+      exists {|
+        start := x;
+        states := [];
+        labels := []
+      |}. split.
+        - unfold is_trace; simpl. split.
+          * trivial.
+          * apply H0.
+        - unfold in_trace; simpl. left; rewrite H2; trivial.
+    + inversion H2. destruct H3. inversion H3. admit.
 Admitted.
 
 
@@ -345,7 +359,25 @@ Definition simulates { QC QA A }
 (* The relation used to show the simulation is the diagonal or identity relation.       *)
 Lemma simulates_counter_1_n: simulates ex_Counter_1 ex_Counter_n (fun qc qa => True).
 Proof.
-Admitted.
+  unfold simulates. split. 
+    * intros. exists qc. split.
+      - trivial.
+      - trivial.
+    * intros. unfold ex_Counter_n. simpl. unfold ex_Counter_1 in H; simpl in H. destruct a.
+      destruct n.
+      + contradiction.
+      + destruct n. simpl.
+        - exists (qa1 + 1). split.
+          -- trivial.
+          -- trivial.
+        - contradiction.
+      + destruct n.
+        - contradiction.
+        - exists (qa1 - S n). split.
+          -- trivial.
+          -- reflexivity.
+
+Qed.
 
 (* If a transition system `tsc` simulates a transition system `tsa`, then for every trace of *)
 (* `tsc`, there exists a trace of `tsa` with the same labels.                                *)
