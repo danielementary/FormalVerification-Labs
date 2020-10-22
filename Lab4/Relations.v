@@ -319,8 +319,10 @@ Proof.
     + rewrite H0. unfold star. exists 0. simpl. trivial.
     + split.
       - inversion H. apply H2.
-      - inversion H.
-Qed.
+      - inversion H. induction (states tr).
+                     * contradiction H0.
+                     * destruct IHl.
+Admitted.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
@@ -345,6 +347,16 @@ Definition simulates { QC QA A }
 (* The relation used to show the simulation is the diagonal or identity relation.       *)
 Lemma simulates_counter_1_n: simulates ex_Counter_1 ex_Counter_n (fun qc qa => True).
 Proof.
+  unfold simulates.
+  split.
+  - intros. exists 0. simpl. split.
+                             + trivial.
+                             + trivial.
+  - intros. exists qc2. simpl. split.
+                               + trivial.
+                               + simpl. destruct a.  induction n.
+                                                     * contradiction H.
+                                                     *
 Admitted.
 
 (* If a transition system `tsc` simulates a transition system `tsa`, then for every trace of *)
@@ -357,4 +369,5 @@ Lemma simulates_inclusion_observable:
       is_trace tsa tra /\
       labels trc = labels tra.
 Proof.
+
 Admitted.
