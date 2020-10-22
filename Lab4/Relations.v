@@ -307,6 +307,7 @@ Lemma in_trace_reachable:
     is_trace ts tr ->
     in_trace q tr ->
     reachable ts q.
+
 Proof.
   intros.
   unfold reachable.
@@ -319,9 +320,21 @@ Proof.
     + rewrite H0. unfold star. exists 0. simpl. trivial.
     + split.
       - inversion H. apply H2.
-      - inversion H. admit.
+      - inversion H. unfold star. induction (states tr) eqn:st_1.
+        * contradiction.
+        * destruct H0.
+          ** simpl in H1. destruct (labels tr) eqn:labl_1.
+              -- contradiction.
+              -- destruct H1. rewrite <- H0. exists 1. simpl. unfold compose. exists a. split.
+                  ++ simpl in H1. exists a0. apply H1.
+                  ++ reflexivity.
+          ** apply IHl. destruct (labels tr) eqn:labl_1.
+               -- rewrite st_1. 
+               -- pose proof is_trace_aux_cons A Q ts (start tr) a l. induction (labels tr) eqn:labl_2.
+                    ++ contradiction.
+                    ++ pose proof H3 a0 l0. destruct H4.
+                       +++ unfold is_trace in H. simpl in H.
 Admitted.
-
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
   forall A Q (ts : Transition_System Q A) q,
@@ -376,7 +389,6 @@ Proof.
         - exists (qa1 - S n). split.
           -- trivial.
           -- reflexivity.
-
 Qed.
 
 (* If a transition system `tsc` simulates a transition system `tsa`, then for every trace of *)
@@ -389,4 +401,5 @@ Lemma simulates_inclusion_observable:
       is_trace tsa tra /\
       labels trc = labels tra.
 Proof.
-Admitted.
+  intros. inversion H. inversion H0. inversion .
+Qed.
