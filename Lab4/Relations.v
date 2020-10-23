@@ -371,40 +371,6 @@ Proof.
       - inversion H6; eauto.
 Qed.
 
-Proof.
-  intros.
-  inversion H. destruct H0. unfold star in H1. inversion H1.
-  induction x0.
-    + simpl in H2.
-      exists {|
-        start := x;
-        states := [];
-        labels := []
-      |}. split.
-        - unfold is_trace; simpl. split.
-          * trivial.
-          * apply H0.
-        - unfold in_trace; simpl. left; rewrite H2; trivial.
-    + apply IHx0. 
-  
-Qed.
-Proof.
-  intros.
-  inversion H. destruct H0. inversion H1.
-  destruct x0.
-    + simpl in H2.
-      exists {|
-        start := x;
-        states := [];
-        labels := []
-      |}. split.
-        - unfold is_trace; simpl. split.
-          * trivial.
-          * apply H0.
-        - unfold in_trace; simpl. left; rewrite H2; trivial.
-    + inversion H2. destruct H3. inversion H3. 
-Admitted.
-
 
 (** Simulation Relations **)
 
