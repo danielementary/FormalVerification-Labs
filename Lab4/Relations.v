@@ -336,15 +336,15 @@ Proof.
     + eauto using super_lemma_1.
 Qed.
 
-Lemma super_lemma_2 :
+Lemma super_lemma_2:
   forall A Q (ts : Transition_System Q A) q (start_s: Q),
     ts |- start_s ~>* q ->
-      exists (states_l labels_l),
-        is_trace_aux ts start_s states_l labels_l /\ In q states_l
-    
+      exists states_l labels_l,
+        is_trace_aux ts start_s states_l labels_l /\ In q states_l.
 Proof.
+  intros. inversion H. intros.
 
-Qed.
+Admitted.
 
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
@@ -358,6 +358,7 @@ Lemma reachable_in_trace:
 Proof.
   intros.
   inversion H. destruct H0. inversion H1.
+  unfold is_trace. unfold in_trace. simpl.
   
 Qed.
 
