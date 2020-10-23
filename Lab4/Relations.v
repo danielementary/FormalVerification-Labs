@@ -358,8 +358,17 @@ Lemma reachable_in_trace:
 Proof.
   intros.
   inversion H. destruct H0. inversion H1.
-  unfold is_trace. unfold in_trace. simpl.
-  
+  unfold is_trace. unfold in_trace. simpl. pose proof super_lemma_2 A Q ts q x. 
+  unshelve epose proof H3 _.
+    * apply H1.
+    * inversion H4. inversion H5. 
+      exists {|
+        start := x;
+        states := x1;
+        labels := x2
+      |}. simpl. split.
+      - inversion H6; eauto.
+      - inversion H6; eauto.
 Qed.
 
 Proof.
