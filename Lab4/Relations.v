@@ -166,7 +166,6 @@ Proof.
   apply H5. unfold compose. exists y. split.
     * apply H1.
     * apply H2.
-
 Qed.
 
 (* The transitive closure of a relation "contains" the relation *)
@@ -315,7 +314,6 @@ Proof.
         * unshelve epose proof IHstates_l labels_l a _ H1. 
           ++ inversion H. apply H3.
           ++ simpl in H. destruct H. eauto using star_1n .
-      
 Qed.
 
 
@@ -358,6 +356,7 @@ Proof.
     exists (cons x0 x1).
     exists (cons x3 x2).
     split.
+    (*to do*)
 Admitted.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
@@ -367,7 +366,6 @@ Lemma reachable_in_trace:
     exists tr,
       is_trace ts tr /\
       in_trace q tr.
-
 Proof.
   intros.
   inversion H. destruct H0. inversion H1.
@@ -428,5 +426,5 @@ Lemma simulates_inclusion_observable:
       is_trace tsa tra /\
       labels trc = labels tra.
 Proof.
-  intros. inversion H. inversion H0. 
-Qed.
+  intros. inversion H. inversion H0.
+Admitted.
