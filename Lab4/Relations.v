@@ -355,9 +355,17 @@ Proof.
     destruct H0.
     exists (cons x0 x1).
     exists (cons x3 x2).
-    split.
-    (*to do*)
-Admitted.
+    destruct H4.
+    - split.
+      -- simpl. split.
+                --- apply H0.
+                ---  apply H2.
+      -- left. unfold In. right. apply H4.
+   - simpl. split. split.
+            -- apply H0.
+            -- apply H2.
+            -- left. left. apply H4.
+Qed.
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
