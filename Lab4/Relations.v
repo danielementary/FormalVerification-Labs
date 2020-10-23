@@ -299,121 +299,25 @@ Proof.
 Qed.
 
 Lemma super_lemma_1 : 
-  forall A Q (ts : Transition_System Q A) q  (labels_l: list A) (states_l: list Q) (start_s: Q),
-    is_trace ts {| start := start_s; states := states_l; labels := labels_l |} ->
-    in_trace q {| start := start_s; states := states_l; labels := labels_l |} ->
-    reachable ts q.
-Proof.
-  intros A Q ts q labels_l states_l.
-  induction states_l.
-    + intros. inversion H. simpl in H2; simpl in H1. unfold reachable. exists start_s.
-      inversion H0. simpl in H3. split.
-      - apply H2.
-      - rewrite H3. unfold star. exists 0. simpl. reflexivity.
-      - split.
-        * apply H2.
-        * unfold star. contradiction.
-    + intros. unfold reachable. destruct H. simpl in H1. unfold in_trace in H0. inversion H0. simpl in  H0. destruct H0.
-      - exists q. split.
-        * rewrite H0. apply H1.
-        * unfold star. exists 0. unfold rel_pow. simpl. reflexivity.
-      - destruct H0.
-        * simpl in H2. rewrite H2 in H0. exists start_s. split.
-          ** apply H1.
-          ** rewrite H2. unfold star; exists 0; unfold rel_pow; simpl; reflexivity.
-        * simpl in H2. exists q. split.
-          ** rewrite H2. apply H1.
-          **  unfold star; exists 0; unfold rel_pow; simpl; reflexivity.
-      - simpl in H0. destruct H0.
-        * exists start_s. split.
-          --  apply H1.
-          -- rewrite H0; unfold star; exists 0; unfold rel_pow; simpl; reflexivity.
-        * destruct H0.
-          ** exists start_s. split.
-            -- apply H1.
-            -- rewrite <- H0. unfold is_trace_aux in H. destruct labels_l in H.
-               ++ simpl in H. contradiction.
-               ++ simpl in H. destruct H. unfold star. exists 1. simpl. unfold compose. exists a. split.
-                  +++ exists a0. apply H.
-                  +++ trivial.
-          ** unfold reachable in IHstates_l. pose proof IHstates_l a. apply H3.
-              -- simpl. unfold is_trace. simpl. split.
-                  ++ unfold is_trace_aux. simpl. destruct states_l eqn:statesDestr.
-                      *** destruct labels_l.
-                          +++ trivial.
-                          +++ trivial.
-                      *** destruct labels_l eqn:labelsDestr.
-                          +++ trivial.
-                          +++ split.
-                              ++++ simpl in H. destruct H. destruct l0.
-                                  --- contradiction.
-                                  --- destruct H4. contradiction.
-        
-        
-Qed.
-
-Lemma super_lemma_1 : 
-  forall A Q (ts : Transition_System Q A) q   (labels_l: list A) (states_l: list Q) (start_s: Q) ,
+  forall A Q (ts : Transition_System Q A) q   (states_l: list Q) (labels_l: list A) (start_s: Q) ,
     is_trace_aux ts start_s states_l labels_l ->
-     q = start_s /\ start_ \/ In q states_l ->
-    reachable ts q.
+    In q states_l ->
+    ts |- start_s ~>* q.
 Proof.
-  intros A Q ts q labels_l states_l. induction states_l.
-    + intros. simpl in H. destruct labels_l.
-      - destruct H0.
-        * unfold reachable. exists start_s. split.
-          ** trivial.
-        
+   induction states_l.
+    + intros. contradiction.
+    + intros. destruct labels_l.
+      - simpl in H. contradiction.
+      - inversion H0.
+        * subst. simpl in H. destruct H. unfold star. exists 1. simpl. unfold compose. exists q. split.
+          ++ exists a0. apply H.
+          ++ reflexivity.
+        * unshelve epose proof IHstates_l labels_l a _ H1. 
+          ++ inversion H. apply H3.
+          ++ simpl in H. destruct H. eauto using star_1n .
+      
 Qed.
 
-
-Lemma super_lemma_1 : 
-  forall A Q (ts : Transition_System Q A) q (start_s: Q) (labels_l: list A) (states_l: list Q),
-    is_trace ts {| start := start_s; states := states_l; labels := labels_l |} ->
-    in_trace q {| start := start_s; states := states_l; labels := labels_l |} ->
-    reachable ts q.
-
-
-
-
-Proof.
-  intros A Q ts q start_s labels_l states_l.
-  induction states_l.
-    + intros. inversion H. simpl in H2; simpl in H1. unfold reachable. exists start_s.
-      inversion H0. simpl in H3. split.
-      - apply H2.
-      - rewrite H3. unfold star. exists 0. simpl. reflexivity.
-      - split.
-        * apply H2.
-        * unfold star. contradiction.
-    + intros. unfold reachable. exists start_s. split.
-      - inversion H. simpl in H2. apply H2.
-      - unfold star. unfold in_trace in H0; simpl in H0. destruct H0.
-        * exists 0. simpl. rewrite H0. reflexivity.
-        * destruct H0.
-          -- exists 1.  unfold is_trace in H; simpl in H. rewrite <- H0. destruct labels_l.
-              **  destruct H. contradiction.
-              ** destruct H. destruct H. simpl. unfold compose. exists a. split.
-                  *** exists a0. apply H.
-                  *** trivial.
-          -- inversion H; simpl in H1. unfold reachable in IHstates_l. generalize start_s.
-        
-
-Qed.
-
-Proof.
-  intros A Q ts q start_s labels_l states_l.
-  induction states_l.
-    + intros. inversion H. simpl in H2; simpl in H1. unfold reachable. exists start_s.
-      inversion H0. simpl in H3. split.
-      - apply H2.
-      - rewrite H3. unfold star. exists 0. simpl. reflexivity.
-      - split.
-        * apply H2.
-        * unfold star. contradiction.
-    + intros. unfold reachable.
-
-Qed.
 
 (** Equivalence between reachability and traces **)
 
@@ -427,30 +331,22 @@ Lemma in_trace_reachable:
 Proof.
   intros.
   unfold reachable.
-  exists (start tr).
-  unfold in_trace in H0.
-  destruct H0.
-  inversion H.
-  split.
-    + apply H2.
-    + rewrite H0. unfold star. exists 0. simpl. trivial.
-    + split.
-      - inversion H. apply H2.
-      - inversion H. unfold star. induction (states tr) eqn:st_1.
-        * contradiction.
-        * destruct H0.
-          ** simpl in H1. destruct (labels tr) eqn:labl_1.
-              -- contradiction.
-              -- destruct H1. rewrite <- H0. exists 1. simpl. unfold compose. exists a. split.
-                  ++ simpl in H1. exists a0. apply H1.
-                  ++ reflexivity.
-          ** apply IHl. destruct (labels tr) eqn:labl_1.
-               -- rewrite st_1. admit. 
-               -- pose proof is_trace_aux_cons A Q ts (start tr) a l. induction (labels tr) eqn:labl_2.
-                    ++ admit.
-                    ++ pose proof H3 a0 l0. destruct H4.
-                       +++ unfold is_trace in H. simpl in H.
-Admitted.
+  exists (start tr). inversion H. inversion H0; subst.
+    + eauto using star_refl.
+    + eauto using super_lemma_1.
+Qed.
+
+Lemma super_lemma_2 :
+  forall A Q (ts : Transition_System Q A) q (start_s: Q),
+    ts |- start_s ~>* q ->
+      exists (states_l labels_l),
+        is_trace_aux ts start_s states_l labels_l /\ In q states_l
+    
+Proof.
+
+Qed.
+
+
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
   forall A Q (ts : Transition_System Q A) q,
