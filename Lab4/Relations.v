@@ -327,7 +327,6 @@ Lemma in_trace_reachable:
     is_trace ts tr ->
     in_trace q tr ->
     reachable ts q.
-
 Proof.
   intros.
   unfold reachable.
@@ -340,12 +339,26 @@ Lemma super_lemma_2:
   forall A Q (ts : Transition_System Q A) q (start_s: Q),
     ts |- start_s ~>* q ->
       exists states_l labels_l,
-        is_trace_aux ts start_s states_l labels_l /\ In q states_l.
+        is_trace_aux ts start_s states_l labels_l /\ (In q states_l \/ start_s = q).
 Proof.
-  intros. inversion H. intros.
-
+  intros. destruct H. generalize dependent start_s. generalize dependent q. induction x.
+  + exists (@nil Q). exists (@nil A). inversion H. unfold rel_pow. destruct H. split.
+                                                                               - unfold is_trace_aux. trivial.
+                                                                               - simpl. right. trivial.
+  + intros.
+    inversion H.
+    inversion H0.
+    pose proof IHx q x0.
+    apply H3 in H2.
+    destruct H2.
+    destruct H2.
+    destruct H2.
+    destruct H0.
+    destruct H0.
+    exists (cons x0 x1).
+    exists (cons x3 x2).
+    split.
 Admitted.
-
 
 (* Conversely, if a state `q` is reachable, there exists a trace containing it *)
 Lemma reachable_in_trace:
@@ -360,7 +373,7 @@ Proof.
   inversion H. destruct H0. inversion H1.
   unfold is_trace. unfold in_trace. simpl. pose proof super_lemma_2 A Q ts q x. 
   unshelve epose proof H3 _.
-    * apply H1.
+    * trivial.
     * inversion H4. inversion H5. 
       exists {|
         start := x;
@@ -368,7 +381,9 @@ Proof.
         labels := x2
       |}. simpl. split.
       - inversion H6; eauto.
-      - inversion H6; eauto.
+      - inversion H6. inversion H8.
+                      right. apply H9.
+                      left. subst. reflexivity.
 Qed.
 
 
